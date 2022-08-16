@@ -17,8 +17,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,18 +109,18 @@ public class StepDef  {
 	public void i_should_receive_a_valid_rate_booking() {
 
 		logger.debug(response.body());
-		
+
 		assertEquals(200, response.statusCode());
-		
+
 		JSONObject json = new JSONObject(response.body());
 
 		assertTrue(json.getDouble("rate") > 0);
 		assertEquals(baseCurrency, json.getString("baseCurrency"));
 		assertEquals(counterCurrency, json.getString("counterCurrency"));
 		assertNotNull(json.getString("bookingRef"));
-		LocalDateTime expiryTime = LocalDateTime.parse(json.getString("expiryTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-		assertTrue(expiryTime.isAfter(LocalDateTime.now()));
-		
+		Instant expiryTime = Instant.parse(json.getString("expiryTime"));
+		assertTrue(expiryTime.isAfter(Instant.now()));
+
 		this.rateBooking = json;
 	}	
 	

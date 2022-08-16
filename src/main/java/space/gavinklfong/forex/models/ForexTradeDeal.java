@@ -9,7 +9,6 @@ import space.gavinklfong.forex.dto.TradeAction;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

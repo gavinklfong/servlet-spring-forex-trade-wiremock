@@ -20,7 +20,6 @@ import space.gavinklfong.forex.repos.CustomerRepo;
 import space.gavinklfong.forex.repos.ForexRateBookingRepo;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -222,8 +221,8 @@ public class ForexRateService {
                 .customerId(request.getCustomerId())
                 .tradeAction(request.getTradeAction())
                 .bookingRef(UUID.randomUUID().toString())
-                .timestamp(Instant.now())
-                .expiryTime(timestamp.plusSeconds(bookingDuration));
+                .timestamp(timestamp)
+                .expiryTime(expiryTime);
 
         if (request.getTradeAction() == TradeAction.SELL)
             builder.rate(rate.getSellRate());

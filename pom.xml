@@ -14,7 +14,7 @@
 	<name>servlet-spring-forex-trade</name>
 	<description>Servlet Forex Trade</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<org.java.version>20220320</org.java.version>
 		<com.opencsv.version>5.6</com.opencsv.version>
 		<org.springdoc.version>1.6.9</org.springdoc.version>

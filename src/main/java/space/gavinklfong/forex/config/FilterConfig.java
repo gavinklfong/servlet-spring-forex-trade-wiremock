@@ -4,9 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.web.filter.CommonsRequestLoggingFilter;
-import org.springframework.web.filter.ServletContextRequestLoggingFilter;
 import space.gavinklfong.forex.filters.IpAddressFilter;
 import space.gavinklfong.forex.filters.RequestLogFilter;
 

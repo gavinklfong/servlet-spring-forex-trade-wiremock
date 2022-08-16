@@ -12,7 +12,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
-import space.gavinklfong.forex.dto.ForexRate;
 import space.gavinklfong.forex.dto.ForexRateBookingReq;
 import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.ErrorBody;
@@ -23,14 +22,9 @@ import space.gavinklfong.forex.services.ForexRateService;
 import space.gavinklfong.forex.setup.StubSetup;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for Rate Rest Controller
@@ -68,21 +62,20 @@ class ForexRateRestControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-		        .expectBody()
-                .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
-//		.jsonPath("$").isArray()
-//		.jsonPath("$[0].baseCurrency").isEqualTo("GBP")
-//		.jsonPath("$[0].counterCurrency").isEqualTo("USD")
-//		.jsonPath("$[0].rate").isNumber()
-//		.jsonPath("$[1].baseCurrency").isEqualTo("GBP")
-//		.jsonPath("$[1].counterCurrency").isEqualTo("EUR")
-//		.jsonPath("$[1].rate").isNumber()
-//		.jsonPath("$[2].baseCurrency").isEqualTo("GBP")
-//		.jsonPath("$[2].counterCurrency").isEqualTo("CAD")
-//		.jsonPath("$[2].rate").isNumber()
-//		.jsonPath("$[3].baseCurrency").isEqualTo("GBP")
-//		.jsonPath("$[3].counterCurrency").isEqualTo("JPY")
-//		.jsonPath("$[3].rate").isNumber();
+                .expectBody()
+                .jsonPath("$").isArray()
+                .jsonPath("$[0].baseCurrency").isEqualTo("GBP")
+                .jsonPath("$[0].counterCurrency").isNotEmpty()
+                .jsonPath("$[0].buyRate").isNumber()
+                .jsonPath("$[0].sellRate").isNumber()
+                .jsonPath("$[1].baseCurrency").isEqualTo("GBP")
+                .jsonPath("$[1].counterCurrency").isNotEmpty()
+                .jsonPath("$[1].buyRate").isNumber()
+                .jsonPath("$[1].sellRate").isNumber()
+                .jsonPath("$[2].baseCurrency").isEqualTo("GBP")
+                .jsonPath("$[2].counterCurrency").isNotEmpty()
+                .jsonPath("$[2].buyRate").isNumber()
+                .jsonPath("$[2].sellRate").isNumber();
     }
 
 

@@ -34,122 +34,48 @@ import static org.mockito.Mockito.when;
 @Tag("UnitTest")
 class ForexRateRestControllerTest {
 
-    @MockBean
-    ForexRateService rateService;
+        @MockBean
+        ForexRateService rateService;
 
-    @MockBean
-    ForexPricingService pricingService;
+        @MockBean
+        ForexPricingService pricingService;
 
-    @Autowired
-    WebApplicationContext wac;
+        @Autowired
+        WebApplicationContext wac;
 
-    WebTestClient webTestClient;
+        WebTestClient webTestClient;
 
-    @BeforeEach
-    void setUp() {
-        webTestClient = MockMvcWebTestClient.bindToApplicationContext(this.wac).build();
-    }
+        @BeforeEach
+        void setUp() {
+                webTestClient = MockMvcWebTestClient.bindToApplicationContext(this.wac).build();
+        }
 
-    @Test
-    void getLatestRates() throws Exception {
+        @Test
+        void getLatestRates() throws Exception {
 
-        // Mock return data of rate service
-        StubSetup.stubForGetForexRates(rateService);
+                // Mock return data of rate service
+                StubSetup.stubForGetForexRates(rateService);
 
-        // trigger API request to rate controller
-        webTestClient.get()
-                .uri("/rates/latest/GBP")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$").isArray()
-                .jsonPath("$[0].baseCurrency").isEqualTo("GBP")
-                .jsonPath("$[0].counterCurrency").isNotEmpty()
-                .jsonPath("$[0].buyRate").isNumber()
-                .jsonPath("$[0].sellRate").isNumber()
-                .jsonPath("$[1].baseCurrency").isEqualTo("GBP")
-                .jsonPath("$[1].counterCurrency").isNotEmpty()
-                .jsonPath("$[1].buyRate").isNumber()
-                .jsonPath("$[1].sellRate").isNumber()
-                .jsonPath("$[2].baseCurrency").isEqualTo("GBP")
-                .jsonPath("$[2].counterCurrency").isNotEmpty()
-                .jsonPath("$[2].buyRate").isNumber()
-                .jsonPath("$[2].sellRate").isNumber();
-    }
-
-
-    @Test
-    void bookRate() throws UnknownCustomerException {
-
-        StubSetup.stubForBookRate(rateService);
-
-        ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
-                .tradeAction(TradeAction.BUY)
-                .baseCurrency("GBP")
-                .counterCurrency("USD")
-                .baseCurrencyAmount(BigDecimal.valueOf(1000))
-                .build();
-
-        webTestClient.post()
-                .uri("/rates/book")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(req), ForexRateBookingReq.class)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(ForexRateBooking.class);
-    }
-
-
-//    @Test
-    // TODO: disabled this test at the moment before the response content type issue is fixed
-    public void bookRate_missingParam() throws UnknownCustomerException {
-
-        StubSetup.stubForBookRate(rateService);
-
-        ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
-                .tradeAction(TradeAction.BUY)
-//                .baseCurrency("GBP")
-                .counterCurrency("USD")
-                .baseCurrencyAmount(BigDecimal.valueOf(1000))
-                .build();
-
-        webTestClient.post()
-                .uri("/rates/book")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(req), ForexRateBookingReq.class)
-                .exchange()
-                .expectStatus().is4xxClientError()
-                .expectBody(ErrorBody.class);
-
-    }
-
-    @Test
-    public void bookRate_unknownCustomer() throws UnknownCustomerException {
-
-        when(rateService.obtainBooking((any(ForexRateBookingReq.class))))
-                .thenThrow(new UnknownCustomerException());
-
-        ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
-                .tradeAction(TradeAction.BUY)
-                .baseCurrency("GBP")
-                .counterCurrency("USD")
-                .baseCurrencyAmount(BigDecimal.valueOf(1000))
-                .build();
-
-        webTestClient.post()
-                .uri("/rates/book")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(req), ForexRateBookingReq.class)
-                .exchange()
-                .expectStatus().is4xxClientError()
-                .expectBody(ErrorBody.class);
-    }
+                // trigger API request to rate controller
+                webTestClient.get()
+                                .uri("/rates/latest/GBP")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody()
+                                .jsonPath("$").isArray()
+                                .jsonPath("$[0].baseCurrency").isEqualTo("GBP")
+                                .jsonPath("$[0].counterCurrency").isNotEmpty()
+                                .jsonPath("$[0].buyRate").isNumber()
+                                .jsonPath("$[0].sellRate").isNumber()
+                                .jsonPath("$[1].baseCurrency").isEqualTo("GBP")
+                                .jsonPath("$[1].counterCurrency").isNotEmpty()
+                                .jsonPath("$[1].buyRate").isNumber()
+                                .jsonPath("$[1].sellRate").isNumber()
+                                .jsonPath("$[2].baseCurrency").isEqualTo("GBP")
+                                .jsonPath("$[2].counterCurrency").isNotEmpty()
+                                .jsonPath("$[2].buyRate").isNumber()
+                                .jsonPath("$[2].sellRate").isNumber();
+        }
 
 }

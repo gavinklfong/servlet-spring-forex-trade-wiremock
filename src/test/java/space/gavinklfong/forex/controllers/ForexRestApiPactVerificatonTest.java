@@ -19,7 +19,8 @@ import space.gavinklfong.forex.services.ForexRateService;
 import space.gavinklfong.forex.services.ForexTradeService;
 import space.gavinklfong.forex.setup.StubSetup;
 
-@WebMvcTest(controllers = {ForexRateRestController.class, ForexTradeDealRestController.class})
+@WebMvcTest(controllers = { ForexRateRestController.class, ForexRateBookingRestController.class,
+        ForexTradeDealRestController.class })
 @ActiveProfiles("pact")
 @Provider("ForexTradeProvider")
 @PactFolder("pacts")

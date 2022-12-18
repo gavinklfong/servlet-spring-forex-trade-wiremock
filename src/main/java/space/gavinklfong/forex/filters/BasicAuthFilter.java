@@ -1,10 +1,10 @@
 package space.gavinklfong.forex.filters;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Map;
 

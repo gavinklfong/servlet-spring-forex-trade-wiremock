@@ -22,8 +22,7 @@ public class WebClientFilter {
 	
 
 	private static void logStatus(ClientResponse response) {
-		HttpStatus status = response.statusCode();
-		logger.debug(String.format("Returned staus code {} ({})", status.value(), status.getReasonPhrase()));
+		logger.debug(String.format("Returned status code {} ({})", response.statusCode().value(), response.statusCode()));
 	}
 	
 	

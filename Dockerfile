@@ -14,7 +14,7 @@ EXPOSE 8080
 
 WORKDIR /app
 
-COPY docker-resources/entrypoint.sh /app/entrypoint.sh
+COPY scripts/entrypoint.sh /app/entrypoint.sh
 
 CMD ["/app/entrypoint.sh"]
 

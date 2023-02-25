@@ -1,21 +1,19 @@
 package space.gavinklfong.forex.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import space.gavinklfong.forex.apiclients.ForexRateApiClient;
 import space.gavinklfong.forex.dto.ForexPricing;
-import space.gavinklfong.forex.dto.ForexRate;
 import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.InvalidRequestException;
 import space.gavinklfong.forex.exceptions.UnknownCustomerException;
 import space.gavinklfong.forex.models.Customer;
+import space.gavinklfong.forex.models.ForexRate;
 import space.gavinklfong.forex.models.ForexRateBooking;
 import space.gavinklfong.forex.models.ForexRateBooking.ForexRateBookingBuilder;
+import space.gavinklfong.forex.models.TradeAction;
 import space.gavinklfong.forex.repos.CustomerRepo;
 import space.gavinklfong.forex.repos.ForexRateBookingRepo;
 
@@ -29,10 +27,8 @@ import java.util.stream.Collectors;
 @Component
 public class ForexRateService {
 
-    private static Logger logger = LoggerFactory.getLogger(ForexRateService.class);
-
     @Value("${app.rate-booking-duration}")
-    private long bookingDuration = 120l;
+    private long bookingDuration = 120L;
 
     @Autowired
     private ForexRateApiClient forexRateApiClient;
@@ -45,6 +41,7 @@ public class ForexRateService {
 
     @Autowired
     private ForexPricingService forexPriceService;
+
 
     /**
      * Retrieve the latest rates for list of counter currencies

@@ -4,7 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.extern.slf4j.Slf4j;
 import space.gavinklfong.forex.dto.ForexPricing;
-import space.gavinklfong.forex.dto.ForexRate;
+import space.gavinklfong.forex.models.ForexRate;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -11,11 +11,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import space.gavinklfong.forex.apiclients.ForexRateApiClient;
-import space.gavinklfong.forex.dto.*;
+import space.gavinklfong.forex.dto.ForexPricing;
+import space.gavinklfong.forex.dto.ForexRateApiResp;
+import space.gavinklfong.forex.dto.ForexRateBookingReq;
 import space.gavinklfong.forex.exceptions.InvalidRequestException;
 import space.gavinklfong.forex.exceptions.UnknownCustomerException;
 import space.gavinklfong.forex.models.Customer;
+import space.gavinklfong.forex.models.ForexRate;
 import space.gavinklfong.forex.models.ForexRateBooking;
+import space.gavinklfong.forex.models.TradeAction;
 import space.gavinklfong.forex.repos.CustomerRepo;
 import space.gavinklfong.forex.repos.ForexRateBookingRepo;
 
@@ -36,7 +40,7 @@ import static org.mockito.Mockito.when;
 })
 @ContextConfiguration(classes = {ForexRateService.class})
 @Tag("UnitTest")
-public class ForexRateServiceTest {
+class ForexRateServiceTest {
 	
 	private static Logger logger = LoggerFactory.getLogger(ForexRateServiceTest.class);
 	

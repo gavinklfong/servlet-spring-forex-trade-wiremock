@@ -1,9 +1,9 @@
 package space.gavinklfong.forex.setup;
 
 import lombok.experimental.UtilityClass;
-import space.gavinklfong.forex.dto.ForexRate;
 import space.gavinklfong.forex.dto.ForexRateBookingReq;
 import space.gavinklfong.forex.dto.ForexTradeDealReq;
+import space.gavinklfong.forex.models.ForexRate;
 import space.gavinklfong.forex.models.ForexRateBooking;
 import space.gavinklfong.forex.models.ForexTradeDeal;
 import space.gavinklfong.forex.services.ForexRateService;
@@ -24,7 +24,7 @@ public class StubSetup {
     public void stubForGetForexRates(ForexRateService forexRateService) {
         when(forexRateService.fetchLatestRates(anyString()))
                 .thenAnswer(invocation -> {
-                    String baseCurrency = (String) invocation.getArgument(0);
+                    String baseCurrency = invocation.getArgument(0);
                     Instant timestamp = Instant.now();
                     return Arrays.asList(
                             ForexRate.builder().timestamp(timestamp).baseCurrency(baseCurrency).counterCurrency("USD").buyRate(Math.random()).sellRate(Math.random()).build(),

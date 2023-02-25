@@ -13,10 +13,10 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
 import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.ErrorBody;
 import space.gavinklfong.forex.exceptions.UnknownCustomerException;
 import space.gavinklfong.forex.models.ForexRateBooking;
+import space.gavinklfong.forex.models.TradeAction;
 import space.gavinklfong.forex.services.ForexPricingService;
 import space.gavinklfong.forex.services.ForexRateService;
 import space.gavinklfong.forex.setup.StubSetup;
@@ -51,7 +51,7 @@ class ForexRateRestControllerTest {
     }
 
     @Test
-    void getLatestRates() throws Exception {
+    void getLatestRates() {
 
         // Mock return data of rate service
         StubSetup.stubForGetForexRates(rateService);
@@ -85,7 +85,7 @@ class ForexRateRestControllerTest {
         StubSetup.stubForBookRate(rateService);
 
         ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
+                .customerId(1L)
                 .tradeAction(TradeAction.BUY)
                 .baseCurrency("GBP")
                 .counterCurrency("USD")
@@ -110,7 +110,7 @@ class ForexRateRestControllerTest {
         StubSetup.stubForBookRate(rateService);
 
         ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
+                .customerId(1L)
                 .tradeAction(TradeAction.BUY)
 //                .baseCurrency("GBP")
                 .counterCurrency("USD")
@@ -129,13 +129,13 @@ class ForexRateRestControllerTest {
     }
 
     @Test
-    public void bookRate_unknownCustomer() throws UnknownCustomerException {
+    void bookRate_unknownCustomer() throws UnknownCustomerException {
 
         when(rateService.obtainBooking((any(ForexRateBookingReq.class))))
                 .thenThrow(new UnknownCustomerException());
 
         ForexRateBookingReq req = ForexRateBookingReq.builder()
-                .customerId(1l)
+                .customerId(1L)
                 .tradeAction(TradeAction.BUY)
                 .baseCurrency("GBP")
                 .counterCurrency("USD")

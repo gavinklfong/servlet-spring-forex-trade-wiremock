@@ -7,12 +7,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import space.gavinklfong.forex.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.InvalidRateBookingException;
 import space.gavinklfong.forex.exceptions.UnknownCustomerException;
 import space.gavinklfong.forex.models.Customer;
 import space.gavinklfong.forex.models.ForexRateBooking;
 import space.gavinklfong.forex.models.ForexTradeDeal;
+import space.gavinklfong.forex.models.TradeAction;
 import space.gavinklfong.forex.repos.CustomerRepo;
 import space.gavinklfong.forex.repos.ForexTradeDealRepo;
 
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.when;
 @SpringJUnitConfig
 @ContextConfiguration(classes = {ForexTradeService.class})
 @Tag("UnitTest")
-public class ForexTradeServiceTest {
+class ForexTradeServiceTest {
 
 	@MockBean
 	private CustomerRepo customerRepo;
@@ -46,7 +47,7 @@ public class ForexTradeServiceTest {
 	private ForexTradeService tradeService;
 	
 	@Test
-	public void postTradeDealTest_success() {
+	void postTradeDealTest_success() {
 		
 		when(tradeDealRepo.save(any(ForexTradeDeal.class))).thenAnswer(invocation -> {
 			ForexTradeDeal deal = (ForexTradeDeal) invocation.getArgument(0);
@@ -74,7 +75,7 @@ public class ForexTradeServiceTest {
 	}
 	
 	@Test
-	public void postTradeDealTest_invalidRateBooking() {
+	void postTradeDealTest_invalidRateBooking() {
 		
 		when(tradeDealRepo.save(any(ForexTradeDeal.class))).thenAnswer(invocation -> {
 			ForexTradeDeal deal = (ForexTradeDeal) invocation.getArgument(0);
@@ -104,7 +105,7 @@ public class ForexTradeServiceTest {
 	}
 	
 	@Test
-	public void postTradeDealTest_unknownCustomer() {
+	void postTradeDealTest_unknownCustomer() {
 		
 		when(tradeDealRepo.save(any(ForexTradeDeal.class))).thenAnswer(invocation -> {
 			ForexTradeDeal deal = (ForexTradeDeal) invocation.getArgument(0);
@@ -134,7 +135,7 @@ public class ForexTradeServiceTest {
 	}
 	
 	@Test
-	public void retrieveTradeDealByCustomerTest() {
+	void retrieveTradeDealByCustomerTest() {
 
 		ForexTradeDeal deal1 = ForexTradeDeal.builder()
 				.id(1l).dealRef(UUID.randomUUID().toString())
@@ -167,20 +168,17 @@ public class ForexTradeServiceTest {
 		
 		when(tradeDealRepo.findByCustomerId(anyLong())).thenReturn(deals);
 		
-		List<ForexTradeDeal> result = tradeService.retrieveTradeDealByCustomer(1l);
-		assertEquals(3, result.size());
-		assertTrue(deal1.equals(result.get(0)));
-		assertTrue(deal2.equals(result.get(1)));
-		assertTrue(deal3.equals(result.get(2)));
-
+		List<ForexTradeDeal> result = tradeService.retrieveTradeDealByCustomer(1L);
+		assertThat(result).hasSize(3)
+						.containsExactly(deal1, deal2, deal3);
 	}
 	
 	@Test
-	public void retrieveTradeDealByCustomerTest_Empty() {
+	void retrieveTradeDealByCustomerTest_Empty() {
 		
 		when(tradeDealRepo.findByCustomerId(anyLong())).thenReturn(null);
 		
-		List<ForexTradeDeal> result = tradeService.retrieveTradeDealByCustomer(1l);
+		List<ForexTradeDeal> result = tradeService.retrieveTradeDealByCustomer(1L);
 
 		assertNull(result);
 	}

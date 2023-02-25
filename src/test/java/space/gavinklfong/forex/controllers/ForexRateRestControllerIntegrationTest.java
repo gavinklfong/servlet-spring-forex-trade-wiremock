@@ -17,9 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import space.gavinklfong.forex.api.dto.ForexRateBookingReq;
+import space.gavinklfong.forex.api.dto.TradeAction;
 import space.gavinklfong.forex.apiclients.ForexRateApiClient;
-import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.UnknownCustomerException;
 import space.gavinklfong.forex.models.ForexRateBooking;
 
@@ -87,13 +87,12 @@ class ForexRateRestControllerIntegrationTest {
 						.withBodyFile("getLatestUSDRateMockResponse.json")));
 
 		// fire request to book rate and verify the response
-		ForexRateBookingReq req = ForexRateBookingReq.builder()
-				.customerId(1l)
+		ForexRateBookingReq req = new ForexRateBookingReq()
+				.customerId(1L)
 				.tradeAction(TradeAction.BUY)
 				.baseCurrency("GBP")
 				.counterCurrency("USD")
-				.baseCurrencyAmount(BigDecimal.valueOf(1000))
-				.build();
+				.baseCurrencyAmount(BigDecimal.valueOf(1000));
 
 		webTestClient.post()
 				.uri("/rates/book")

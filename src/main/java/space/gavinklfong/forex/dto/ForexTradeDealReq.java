@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import space.gavinklfong.forex.models.TradeAction;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

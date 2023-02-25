@@ -1,26 +1,28 @@
 package space.gavinklfong.forex.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import space.gavinklfong.forex.dto.ForexRate;
-import space.gavinklfong.forex.dto.ForexRateBookingReq;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import space.gavinklfong.forex.adapters.ApiModelAdapter;
+import space.gavinklfong.forex.api.RateApiApi;
+import space.gavinklfong.forex.api.dto.ForexRate;
+import space.gavinklfong.forex.api.dto.ForexRateBooking;
+import space.gavinklfong.forex.api.dto.ForexRateBookingReq;
 import space.gavinklfong.forex.exceptions.InvalidRequestException;
-import space.gavinklfong.forex.models.ForexRateBooking;
 import space.gavinklfong.forex.services.ForexPricingService;
 import space.gavinklfong.forex.services.ForexRateService;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/rates")
-public class ForexRateRestController {
+public class ForexRateRestController implements RateApiApi {
 
 	@Value("${app.default-base-currency}")
 	private String defaultBaseCurrency;
@@ -31,35 +33,40 @@ public class ForexRateRestController {
 	@Autowired
 	private ForexPricingService pricingService;
 
+	private final ApiModelAdapter mapper = Mappers.getMapper(ApiModelAdapter.class);
+
 	@GetMapping(path = {"base-currencies", "base-currencies/"})
-	public List<String> getBaseCurrencies() {
-
-		return pricingService.findAllBaseCurrencies();
-
+	public ResponseEntity<List<String>> getBaseCurrencies() {
+		return ResponseEntity.ok().body(pricingService.findAllBaseCurrencies());
 	}
 
-	@GetMapping(path = {"latest", "latest/", "latest/{optionalBaseCurrency}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<ForexRate> getLatestRates(@PathVariable Optional<String> optionalBaseCurrency) throws InvalidRequestException {
-
-		String baseCurrency = optionalBaseCurrency.orElse(defaultBaseCurrency);
-
-		return rateService.fetchLatestRates(baseCurrency);
-
+	@Override
+	public ResponseEntity<ForexRate> getLatestRates(String baseCurrency, String counterCurrency) {
+		return ResponseEntity.ok().body(
+				mapper.mapModelToDto(rateService.fetchLatestRate(baseCurrency, counterCurrency))
+		);
 	}
 
-	@GetMapping(path = "latest/{baseCurrency}/{counterCurrency}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ForexRate getLatestRates(@PathVariable String baseCurrency, @PathVariable String counterCurrency) throws InvalidRequestException {
-
-		return rateService.fetchLatestRate(baseCurrency, counterCurrency);
-
+	@Override
+	public ResponseEntity<List<ForexRate>> getLatestRatesByBaseCurrency(String baseCurrency) {
+		return ResponseEntity.ok().body(
+				mapper.mapModelToForexRateDtoList(rateService.fetchLatestRates(baseCurrency))
+		);
 	}
 
-	@PostMapping(path = "book", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ForexRateBooking bookRate(@Valid @RequestBody ForexRateBookingReq req) throws InvalidRequestException {
-
-		// obtain booking
-		return rateService.obtainBooking(req);
-
+	@Override
+	public ResponseEntity<List<ForexRate>> getLatestRatesByDefaultBaseCurrency() throws InvalidRequestException {
+		return ResponseEntity.ok().body(
+				mapper.mapModelToForexRateDtoList(rateService.fetchLatestRates(defaultBaseCurrency))
+		);
 	}
 
+	@Override
+	public ResponseEntity<ForexRateBooking> bookRate(ForexRateBookingReq req) throws InvalidRequestException {
+		return ResponseEntity.ok().body(
+				mapper.mapModelToDto(
+						rateService.obtainBooking(mapper.mapApiDtoToDto(req))
+				)
+		);
+	}
 }

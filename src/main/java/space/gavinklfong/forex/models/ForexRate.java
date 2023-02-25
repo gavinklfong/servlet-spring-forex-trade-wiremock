@@ -1,4 +1,4 @@
-package space.gavinklfong.forex.dto;
+package space.gavinklfong.forex.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Builder;

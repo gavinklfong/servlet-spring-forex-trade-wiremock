@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,8 +13,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
-import space.gavinklfong.forex.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.dto.TradeAction;
+import space.gavinklfong.forex.adapters.ApiModelAdapter;
+import space.gavinklfong.forex.api.dto.ForexTradeDealReq;
+import space.gavinklfong.forex.api.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.ErrorBody;
 import space.gavinklfong.forex.models.ForexTradeDeal;
 import space.gavinklfong.forex.services.ForexTradeService;
@@ -29,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @WebMvcTest(ForexTradeDealRestController.class)
 @Tag("UnitTest")
-public class ForexTradeDealRestControllerTest {
+class ForexTradeDealRestControllerTest {
 
 	@MockBean
 	private ForexTradeService tradeService;
@@ -39,6 +41,8 @@ public class ForexTradeDealRestControllerTest {
 
 	WebTestClient webTestClient;
 
+	private final ApiModelAdapter mapper = Mappers.getMapper(ApiModelAdapter.class);
+
 	@BeforeEach
 	void setUp() {
 		webTestClient = MockMvcWebTestClient.bindToApplicationContext(this.wac).build();
@@ -46,19 +50,18 @@ public class ForexTradeDealRestControllerTest {
 
 	@DisplayName("submitDeal - Success case")
 	@Test
-	public void submitDeal() throws Exception {
+	void submitDeal() {
 
 		StubSetup.stubForSubmitDeal(tradeService);
 
-		ForexTradeDealReq req = ForexTradeDealReq.builder()
+		ForexTradeDealReq req = new ForexTradeDealReq()
 				.tradeAction(TradeAction.BUY)
 				.baseCurrency("GBP")
 				.counterCurrency("USD")
 				.rate(0.25)
 				.baseCurrencyAmount(BigDecimal.valueOf(10000))
-				.customerId(1l)
-				.rateBookingRef("ABC")
-				.build();
+				.customerId(1L)
+				.rateBookingRef("ABC");
 		
 		webTestClient.post()
 		.uri("/deals")
@@ -73,7 +76,7 @@ public class ForexTradeDealRestControllerTest {
 	@DisplayName("submitDeal - Invalid Req")
 	// TODO: disabled this test at the moment before the response content type issue is fixed
 //	@Test
-	public void submitDeal_invalidReq() throws Exception {
+	void submitDeal_invalidReq() throws Exception {
 
 		StubSetup.stubForSubmitDeal(tradeService);
 			
@@ -91,7 +94,7 @@ public class ForexTradeDealRestControllerTest {
 	
 	@DisplayName("getDeal - Success case")
 	@Test
-	public void getDeals() throws Exception {
+	void getDeals() throws Exception {
 
 		ForexTradeDeal deal1 =
 				ForexTradeDeal.builder()
@@ -99,7 +102,7 @@ public class ForexTradeDealRestControllerTest {
 						.timestamp(Instant.now())
 						.baseCurrency("GBP").counterCurrency("USD")
 						.rate(Math.random()).baseCurrencyAmount(BigDecimal.valueOf(1000)).customerId(1l)
-						.tradeAction(TradeAction.BUY)
+						.tradeAction(space.gavinklfong.forex.models.TradeAction.BUY)
 						.build();
 
 		ForexTradeDeal deal2 =
@@ -108,7 +111,7 @@ public class ForexTradeDealRestControllerTest {
 						.timestamp(Instant.now())
 						.baseCurrency("GBP").counterCurrency("USD")
 						.rate(Math.random()).baseCurrencyAmount(BigDecimal.valueOf(1000)).customerId(1l)
-						.tradeAction(TradeAction.BUY)
+						.tradeAction(space.gavinklfong.forex.models.TradeAction.BUY)
 						.build();
 
 		ForexTradeDeal deal3 =
@@ -117,7 +120,7 @@ public class ForexTradeDealRestControllerTest {
 						.timestamp(Instant.now())
 						.baseCurrency("GBP").counterCurrency("USD")
 						.rate(Math.random()).baseCurrencyAmount(BigDecimal.valueOf(1000)).customerId(1l)
-						.tradeAction(TradeAction.BUY)
+						.tradeAction(space.gavinklfong.forex.models.TradeAction.BUY)
 						.build();
 				
 		when(tradeService.retrieveTradeDealByCustomer((anyLong())))

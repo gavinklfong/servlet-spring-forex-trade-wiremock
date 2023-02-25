@@ -19,13 +19,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import space.gavinklfong.forex.api.dto.*;
 import space.gavinklfong.forex.apiclients.ForexRateApiClient;
-import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.dto.TradeAction;
 import space.gavinklfong.forex.exceptions.ErrorBody;
-import space.gavinklfong.forex.models.ForexRateBooking;
-import space.gavinklfong.forex.models.ForexTradeDeal;
 
 import java.math.BigDecimal;
 
@@ -38,11 +34,11 @@ import static space.gavinklfong.forex.controllers.Constants.WIRE_MOCK_PORT;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integrationtest")
 @Tag("IntegrationTest")
-public class ForexTradeDealRestControllerIntegrationTest {
+class ForexTradeDealRestControllerIntegrationTest {
 	
 	@DisplayName("submitDeal - Success case")
 	@Test
-	public void submitDeal() throws Exception {
+	void submitDeal() throws Exception {
 
 		stubFor(get("/rates/GBP-USD").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
@@ -50,13 +46,12 @@ public class ForexTradeDealRestControllerIntegrationTest {
 						.withBodyFile("getLatestUSDRateMockResponse.json")));
 
 		// fire request to book rate and verify the response
-		ForexRateBookingReq bookingReq = ForexRateBookingReq.builder()
-				.customerId(1l)
+		ForexRateBookingReq bookingReq = new ForexRateBookingReq()
+				.customerId(1L)
 				.tradeAction(TradeAction.BUY)
 				.baseCurrency("GBP")
 				.counterCurrency("USD")
-				.baseCurrencyAmount(BigDecimal.valueOf(1000))
-				.build();
+				.baseCurrencyAmount(BigDecimal.valueOf(1000));
 
 		EntityExchangeResult<ForexRateBooking> result = webTestClient.post()
 				.uri("/rates/book")
@@ -71,15 +66,14 @@ public class ForexTradeDealRestControllerIntegrationTest {
 		ForexRateBooking rateBooking = result.getResponseBody();
 
 		// construct and trigger trade deal request
-		ForexTradeDealReq dealReq = ForexTradeDealReq.builder()
+		ForexTradeDealReq dealReq = new ForexTradeDealReq()
 				.tradeAction(rateBooking.getTradeAction())
 				.baseCurrency(rateBooking.getBaseCurrency())
 				.counterCurrency(rateBooking.getCounterCurrency())
 				.rate(rateBooking.getRate())
 				.baseCurrencyAmount(rateBooking.getBaseCurrencyAmount())
 				.customerId(rateBooking.getCustomerId())
-				.rateBookingRef(rateBooking.getBookingRef())
-				.build();
+				.rateBookingRef(rateBooking.getBookingRef());
 
 		webTestClient.post()
 				.uri("/deals")
@@ -108,14 +102,14 @@ public class ForexTradeDealRestControllerIntegrationTest {
 	static class TestContextConfiguration {
 		@Bean
 		@Primary
-		public ForexRateApiClient initializeForexRateApiClient() {
+		ForexRateApiClient initializeForexRateApiClient() {
 			return new ForexRateApiClient(format("http://localhost:%d", WIRE_MOCK_PORT));
 		}
 	}
 
 	@DisplayName("submitDeal - Invalid Req")
 	@Test
-	public void submitDeal_invalidReq() throws Exception {
+	void submitDeal_invalidReq() throws Exception {
 
 		// send an empty request
 		ForexTradeDealReq req = new ForexTradeDealReq();
@@ -132,7 +126,7 @@ public class ForexTradeDealRestControllerIntegrationTest {
 	
 	@DisplayName("getDeal - Success case")
 	@Test
-	public void getDeals() throws Exception {
+	void getDeals() throws Exception {
 
 		
 		webTestClient.get()

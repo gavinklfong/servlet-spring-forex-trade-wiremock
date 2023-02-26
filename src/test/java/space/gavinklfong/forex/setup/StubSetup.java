@@ -1,13 +1,13 @@
 package space.gavinklfong.forex.setup;
 
 import lombok.experimental.UtilityClass;
-import space.gavinklfong.forex.dto.ForexRate;
-import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.models.ForexRateBooking;
-import space.gavinklfong.forex.models.ForexTradeDeal;
-import space.gavinklfong.forex.services.ForexRateService;
-import space.gavinklfong.forex.services.ForexTradeService;
+import space.gavinklfong.forex.domain.dto.ForexRateBookingReq;
+import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
+import space.gavinklfong.forex.domain.model.ForexRate;
+import space.gavinklfong.forex.domain.model.ForexRateBooking;
+import space.gavinklfong.forex.domain.model.ForexTradeDeal;
+import space.gavinklfong.forex.domain.service.ForexRateService;
+import space.gavinklfong.forex.domain.service.ForexTradeService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,7 +24,7 @@ public class StubSetup {
     public void stubForGetForexRates(ForexRateService forexRateService) {
         when(forexRateService.fetchLatestRates(anyString()))
                 .thenAnswer(invocation -> {
-                    String baseCurrency = (String) invocation.getArgument(0);
+                    String baseCurrency = invocation.getArgument(0);
                     Instant timestamp = Instant.now();
                     return Arrays.asList(
                             ForexRate.builder().timestamp(timestamp).baseCurrency(baseCurrency).counterCurrency("USD").buyRate(Math.random()).sellRate(Math.random()).build(),

@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import space.gavinklfong.forex.filters.IpAddressFilter;
-import space.gavinklfong.forex.filters.RequestLogFilter;
+import space.gavinklfong.forex.filter.IpAddressFilter;
+import space.gavinklfong.forex.filter.RequestLogFilter;
 
 import java.util.List;
 

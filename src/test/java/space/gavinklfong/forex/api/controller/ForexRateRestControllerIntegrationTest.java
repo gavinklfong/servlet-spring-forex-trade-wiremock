@@ -20,13 +20,12 @@ import reactor.core.publisher.Mono;
 import space.gavinklfong.forex.api.dto.ApiTradeAction;
 import space.gavinklfong.forex.api.dto.ForexRateBookingApiRequest;
 import space.gavinklfong.forex.apiclient.ForexRateApiClient;
-import space.gavinklfong.forex.exception.UnknownCustomerException;
 import space.gavinklfong.forex.domain.model.ForexRateBooking;
+import space.gavinklfong.forex.exception.UnknownCustomerException;
 
 import java.math.BigDecimal;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.lang.String.format;
 
 @Slf4j
 @WireMockTest(httpPort = Constants.WIRE_MOCK_PORT)

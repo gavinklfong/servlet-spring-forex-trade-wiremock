@@ -13,13 +13,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
+import space.gavinklfong.forex.api.dto.ApiResponseErrorBody;
 import space.gavinklfong.forex.api.dto.ApiTradeAction;
 import space.gavinklfong.forex.api.dto.ForexTradeDealApiRequest;
-import space.gavinklfong.forex.mapper.ApiModelAdapter;
-import space.gavinklfong.forex.domain.model.TradeAction;
-import space.gavinklfong.forex.exception.ErrorBody;
 import space.gavinklfong.forex.domain.model.ForexTradeDeal;
+import space.gavinklfong.forex.domain.model.TradeAction;
 import space.gavinklfong.forex.domain.service.ForexTradeService;
+import space.gavinklfong.forex.mapper.ApiModelAdapter;
 import space.gavinklfong.forex.setup.StubSetup;
 
 import java.math.BigDecimal;
@@ -77,7 +77,7 @@ class ForexTradeDealRestControllerTest {
 	@DisplayName("submitDeal - Invalid Req")
 	// TODO: disabled this test at the moment before the response content type issue is fixed
 //	@Test
-	void submitDeal_invalidReq() throws Exception {
+	void submitDeal_invalidReq() {
 
 		StubSetup.stubForSubmitDeal(tradeService);
 
@@ -90,12 +90,12 @@ class ForexTradeDealRestControllerTest {
 		.accept(MediaType.APPLICATION_JSON)
 		.exchange()
 		.expectStatus().is4xxClientError()
-		.expectBody(ErrorBody.class);
+		.expectBody(ApiResponseErrorBody.class);
 	}
 	
 	@DisplayName("getDeal - Success case")
 	@Test
-	void getDeals() throws Exception {
+	void getDeals() {
 
 		ForexTradeDeal deal1 =
 				ForexTradeDeal.builder()
@@ -120,7 +120,7 @@ class ForexTradeDealRestControllerTest {
 						.id(1L).dealRef(UUID.randomUUID().toString())
 						.timestamp(Instant.now())
 						.baseCurrency("GBP").counterCurrency("USD")
-						.rate(Math.random()).baseCurrencyAmount(BigDecimal.valueOf(1000)).customerId(1l)
+						.rate(Math.random()).baseCurrencyAmount(BigDecimal.valueOf(1000)).customerId(1L)
 						.tradeAction(TradeAction.BUY)
 						.build();
 				

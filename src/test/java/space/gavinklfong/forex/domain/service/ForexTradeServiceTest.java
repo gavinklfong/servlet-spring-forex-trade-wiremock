@@ -7,14 +7,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.exception.InvalidRateBookingException;
-import space.gavinklfong.forex.exception.UnknownCustomerException;
 import space.gavinklfong.forex.domain.model.Customer;
 import space.gavinklfong.forex.domain.model.ForexRateBooking;
 import space.gavinklfong.forex.domain.model.ForexTradeDeal;
 import space.gavinklfong.forex.domain.model.TradeAction;
 import space.gavinklfong.forex.domain.repo.CustomerRepo;
 import space.gavinklfong.forex.domain.repo.ForexTradeDealRepo;
+import space.gavinklfong.forex.exception.InvalidRateBookingException;
+import space.gavinklfong.forex.exception.UnknownCustomerException;
 
 import java.math.BigDecimal;
 import java.time.Instant;

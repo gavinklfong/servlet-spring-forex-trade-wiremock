@@ -12,13 +12,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
+import space.gavinklfong.forex.api.dto.ApiResponseErrorBody;
 import space.gavinklfong.forex.domain.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.exception.ErrorBody;
-import space.gavinklfong.forex.exception.UnknownCustomerException;
 import space.gavinklfong.forex.domain.model.ForexRateBooking;
 import space.gavinklfong.forex.domain.model.TradeAction;
 import space.gavinklfong.forex.domain.service.ForexPricingService;
 import space.gavinklfong.forex.domain.service.ForexRateService;
+import space.gavinklfong.forex.exception.UnknownCustomerException;
 import space.gavinklfong.forex.setup.StubSetup;
 
 import java.math.BigDecimal;
@@ -124,7 +124,7 @@ class ForexRateRestControllerTest {
                 .body(Mono.just(req), ForexRateBookingReq.class)
                 .exchange()
                 .expectStatus().is4xxClientError()
-                .expectBody(ErrorBody.class);
+                .expectBody(ApiResponseErrorBody.class);
 
     }
 
@@ -149,7 +149,7 @@ class ForexRateRestControllerTest {
                 .body(Mono.just(req), ForexRateBookingReq.class)
                 .exchange()
                 .expectStatus().is4xxClientError()
-                .expectBody(ErrorBody.class);
+                .expectBody(ApiResponseErrorBody.class);
     }
 
 }

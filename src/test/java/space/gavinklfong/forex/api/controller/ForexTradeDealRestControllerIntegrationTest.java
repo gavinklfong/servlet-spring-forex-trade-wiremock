@@ -21,12 +21,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import space.gavinklfong.forex.api.dto.*;
 import space.gavinklfong.forex.apiclient.ForexRateApiClient;
-import space.gavinklfong.forex.exception.ErrorBody;
 
 import java.math.BigDecimal;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.lang.String.format;
 
 @Slf4j
 @WireMockTest(httpPort = Constants.WIRE_MOCK_PORT)
@@ -37,7 +35,7 @@ class ForexTradeDealRestControllerIntegrationTest {
 	
 	@DisplayName("submitDeal - Success case")
 	@Test
-	void submitDeal() throws Exception {
+	void submitDeal() {
 
 		stubFor(get("/rates/GBP-USD").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
@@ -108,7 +106,7 @@ class ForexTradeDealRestControllerIntegrationTest {
 
 	@DisplayName("submitDeal - Invalid Req")
 	@Test
-	void submitDeal_invalidReq() throws Exception {
+	void submitDeal_invalidReq() {
 
 		// send an empty request
 		ForexTradeDealApiRequest req = new ForexTradeDealApiRequest();
@@ -120,12 +118,12 @@ class ForexTradeDealRestControllerIntegrationTest {
 		.accept(MediaType.APPLICATION_JSON)
 		.exchange()
 		.expectStatus().is4xxClientError()
-		.expectBody(ErrorBody.class);
+		.expectBody(ApiResponseErrorBody.class);
 	}
 	
 	@DisplayName("getDeal - Success case")
 	@Test
-	void getDeals() throws Exception {
+	void getDeals() {
 
 		
 		webTestClient.get()

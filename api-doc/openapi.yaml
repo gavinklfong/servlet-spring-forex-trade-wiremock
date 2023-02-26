@@ -10,9 +10,9 @@ servers:
   - url: http://localhost:8080
     description: Generated server url
 tags:
-  - name: Rate API
+  - name: Rate
     description: Forex rate retrieval and booking
-  - name: Deal API
+  - name: Deal
     description: Forex trade deal retrieval and submission
 paths:
   /rates/book:

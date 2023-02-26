@@ -1,12 +1,10 @@
 package space.gavinklfong.forex.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import space.gavinklfong.forex.api.RateApi;
 import space.gavinklfong.forex.api.dto.ForexRateApiResponse;
@@ -33,9 +31,9 @@ public class ForexRateRestController implements RateApi {
 	@Autowired
 	private ForexPricingService pricingService;
 
-	private final ApiModelAdapter mapper = Mappers.getMapper(ApiModelAdapter.class);
+	private static final ApiModelAdapter mapper = ApiModelAdapter.INSTANCE;
 
-	@GetMapping(path = {"base-currencies", "base-currencies/"})
+	@Override
 	public ResponseEntity<List<String>> getBaseCurrencies() {
 		return ResponseEntity.ok().body(pricingService.findAllBaseCurrencies());
 	}

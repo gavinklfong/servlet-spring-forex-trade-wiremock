@@ -1,27 +1,25 @@
 package space.gavinklfong.forex.api.controller;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import space.gavinklfong.forex.api.DealApi;
 import space.gavinklfong.forex.api.dto.ForexTradeDealApiRequest;
 import space.gavinklfong.forex.api.dto.ForexTradeDealApiResponse;
+import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
+import space.gavinklfong.forex.domain.model.ForexTradeDeal;
 import space.gavinklfong.forex.domain.service.ForexTradeService;
 import space.gavinklfong.forex.exception.InvalidRateBookingException;
 import space.gavinklfong.forex.exception.InvalidRequestException;
 import space.gavinklfong.forex.exception.UnknownCustomerException;
 import space.gavinklfong.forex.mapper.ApiModelAdapter;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 public class ForexTradeDealRestController implements DealApi {
 
-	private final ApiModelAdapter mapper = Mappers.getMapper(ApiModelAdapter.class);
+	private static final ApiModelAdapter mapper = ApiModelAdapter.INSTANCE;
 
 	@Autowired
 	private ForexTradeService tradeService;
@@ -37,14 +35,17 @@ public class ForexTradeDealRestController implements DealApi {
 	 * @return List of forex trade deal records. The framework formats it into JSON format when sending HTTP response
 	 */
 	@Override
-	public ResponseEntity<List<ForexTradeDealApiResponse>> getDeals(@RequestParam Long customerId) throws InvalidRequestException {
+	public ResponseEntity<List<ForexTradeDealApiResponse>> getDeals(Long customerId)
+			throws InvalidRequestException {
 		
 		if (customerId == null) {
 			throw new InvalidRequestException("customerId", "customer Id cannot be blank");
 		}
 				
 		return ResponseEntity.ok().body(
-				mapper.mapModelToForexTradeDealApiResponse(tradeService.retrieveTradeDealByCustomer(customerId))
+				mapper.mapModelToForexTradeDealApiResponse(
+						tradeService.retrieveTradeDealByCustomer(customerId)
+				)
 		);
 	}
 
@@ -62,14 +63,17 @@ public class ForexTradeDealRestController implements DealApi {
 	 * @return Trade deal object. The framework formats it into JSON format when sending HTTP response
 	 */
 	@Override
-	public ResponseEntity<ForexTradeDealApiResponse> submitDeal(@Valid @RequestBody ForexTradeDealApiRequest req) throws UnknownCustomerException, InvalidRateBookingException {
-		
-		// submit trade deal
-		return ResponseEntity.ok().body(
-				mapper.mapModelToApiResponse(
-						tradeService.postTradeDeal(mapper.mapApiRequestToDto(req))
-				)
-		);
+	public ResponseEntity<ForexTradeDealApiResponse> submitDeal(ForexTradeDealApiRequest req)
+			throws UnknownCustomerException, InvalidRateBookingException {
+
+		// map API object to domain object
+		ForexTradeDealReq request = mapper.mapApiRequestToDto(req);
+
+		// submit request to domain logic
+		ForexTradeDeal tradeDeal = tradeService.postTradeDeal(request);
+
+		// map domain object to api object
+		return ResponseEntity.ok().body(mapper.mapModelToApiResponse(tradeDeal));
 	}
 
 }

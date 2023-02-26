@@ -1,6 +1,7 @@
 package space.gavinklfong.forex.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import space.gavinklfong.forex.api.dto.*;
 import space.gavinklfong.forex.domain.dto.ForexRateBookingReq;
 import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
@@ -16,6 +17,8 @@ import java.util.List;
 
 @Mapper
 public interface ApiModelAdapter {
+
+    ApiModelAdapter INSTANCE = Mappers.getMapper(ApiModelAdapter.class);
     ForexRateBookingApiResponse mapModelToApiResponse(ForexRateBooking forexRateBooking);
     ForexRateApiResponse mapModelToApiResponse(ForexRate forexRate);
     List<ForexRateApiResponse> mapModelToForexRateApiResponse(List<ForexRate> forexRates);

@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Forex API
   description: This is a sample API for the demonstration of foreign exchange trading.
-  version: v0.1
+  version: v0.2
 externalDocs:
   description: Forex API GitHub
   url: https://github.com/gavinklfong/servlet-spring-forex-trade-wiremock
@@ -18,13 +18,13 @@ paths:
   /rates/book:
     post:
       tags:
-        - Rate API
+        - Rate
       operationId: bookRate
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForexRateBookingReq'
+              $ref: '#/components/schemas/ForexRateBookingApiRequest'
         required: true
       responses:
         "400":
@@ -32,17 +32,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForexRateBooking'
+                $ref: '#/components/schemas/ForexRateBookingApiResponse'
   /deals:
     get:
       tags:
-        - Deal API
+        - Deal
       operationId: getDeals
       parameters:
         - name: customerId
@@ -57,7 +57,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: OK
           content:
@@ -65,10 +65,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ForexTradeDeal'
+                  $ref: '#/components/schemas/ForexTradeDealApiResponse'
     post:
       tags:
-        - Deal API
+        - Deal
       summary: Submit forex trade deal
       description: "This API submits a forex trading request with amount, rate, trade\
         \ action and a valid booking reference. The booking reference will be validated\
@@ -80,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForexTradeDealReq'
+              $ref: '#/components/schemas/ForexTradeDealApiRequest'
         required: true
       responses:
         "400":
@@ -88,23 +88,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: Deal has been submitted successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForexTradeDeal'
+                $ref: '#/components/schemas/ForexTradeDealApiResponse'
         "500":
           description: Server internal error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
   /rates/latest/{baseCurrency}/{counterCurrency}:
     get:
       tags:
-        - Rate API
+        - Rate
       summary: Get the latest rate for the specified base currency and counter currency
       operationId: getLatestRates
       parameters:
@@ -126,13 +126,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: Exchange Rate
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForexRate'
+                $ref: '#/components/schemas/ForexRateApiResponse'
               examples:
                 GBP/USD rate response:
                   description: GBP/USD rate response
@@ -155,7 +155,7 @@ paths:
   /rates/latest/{baseCurrency}:
     get:
       tags:
-        - Rate API
+        - Rate
       summary: Get the latest rates for the specified base currency
       operationId: getLatestRatesByBaseCurrency
       parameters:
@@ -171,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: OK
           content:
@@ -179,11 +179,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ForexRate'
+                  $ref: '#/components/schemas/ForexRateApiResponse'
   /rates/latest:
     get:
       tags:
-        - Rate API
+        - Rate
       summary: Get the latest rates for the specified base currency
       operationId: getLatestRatesByDefaultBaseCurrency
       responses:
@@ -192,7 +192,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: OK
           content:
@@ -200,11 +200,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ForexRate'
+                  $ref: '#/components/schemas/ForexRateApiResponse'
   /rates/base-currencies:
     get:
       tags:
-        - Rate API
+        - Rate
       operationId: getBaseCurrencies
       responses:
         "400":
@@ -212,7 +212,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorBody'
+                $ref: '#/components/schemas/ApiResponseErrorBody'
         "200":
           description: OK
           content:
@@ -223,21 +223,21 @@ paths:
                   type: string
 components:
   schemas:
-    ErrorBody:
+    ApiResponseErrorBody:
       type: object
       properties:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/ErrorMessage'
-    ErrorMessage:
+            $ref: '#/components/schemas/ApiErrorMessage'
+    ApiErrorMessage:
       type: object
       properties:
         code:
           type: string
         message:
           type: string
-    ForexRateBookingReq:
+    ForexRateBookingApiRequest:
       required:
         - baseCurrency
         - baseCurrencyAmount
@@ -255,11 +255,11 @@ components:
           minimum: 0
           exclusiveMinimum: true
         tradeAction:
-          $ref: '#/components/schemas/TradeAction'
+          $ref: '#/components/schemas/ApiTradeAction'
         customerId:
           type: integer
           format: int64
-    ForexRateBooking:
+    ForexRateBookingApiResponse:
       type: object
       properties:
         id:
@@ -276,7 +276,7 @@ components:
           type: number
           format: double
         tradeAction:
-          $ref: '#/components/schemas/TradeAction'
+          $ref: '#/components/schemas/ApiTradeAction'
         baseCurrencyAmount:
           type: number
           minimum: 0
@@ -289,7 +289,7 @@ components:
         customerId:
           type: integer
           format: int64
-    ForexTradeDealReq:
+    ForexTradeDealApiRequest:
       required:
         - baseCurrency
         - baseCurrencyAmount
@@ -311,7 +311,7 @@ components:
           format: double
           example: 1.25
         tradeAction:
-          $ref: '#/components/schemas/TradeAction'
+          $ref: '#/components/schemas/ApiTradeAction'
         baseCurrencyAmount:
           type: number
           example: 1000
@@ -324,7 +324,7 @@ components:
         rateBookingRef:
           type: string
           example: 002c0ed8-2208-4d71-af3f-333ebc867eea
-    ForexTradeDeal:
+    ForexTradeDealApiResponse:
       type: object
       properties:
         id:
@@ -348,7 +348,7 @@ components:
           format: double
           example: 1.25
         tradeAction:
-          $ref: '#/components/schemas/TradeAction'
+          $ref: '#/components/schemas/ApiTradeAction'
         baseCurrencyAmount:
           type: number
           example: 1000
@@ -356,7 +356,7 @@ components:
           type: integer
           format: int64
           example: 1
-    ForexRate:
+    ForexRateApiResponse:
       type: object
       properties:
         timestamp:
@@ -375,7 +375,7 @@ components:
         spread:
           type: number
           format: double
-    TradeAction:
+    ApiTradeAction:
       type: string
       enum:
         - BUY

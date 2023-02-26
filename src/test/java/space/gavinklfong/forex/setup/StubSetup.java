@@ -1,13 +1,13 @@
 package space.gavinklfong.forex.setup;
 
 import lombok.experimental.UtilityClass;
-import space.gavinklfong.forex.dto.ForexRateBookingReq;
-import space.gavinklfong.forex.dto.ForexTradeDealReq;
-import space.gavinklfong.forex.models.ForexRate;
-import space.gavinklfong.forex.models.ForexRateBooking;
-import space.gavinklfong.forex.models.ForexTradeDeal;
-import space.gavinklfong.forex.services.ForexRateService;
-import space.gavinklfong.forex.services.ForexTradeService;
+import space.gavinklfong.forex.domain.dto.ForexRateBookingReq;
+import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
+import space.gavinklfong.forex.domain.model.ForexRate;
+import space.gavinklfong.forex.domain.model.ForexRateBooking;
+import space.gavinklfong.forex.domain.model.ForexTradeDeal;
+import space.gavinklfong.forex.domain.service.ForexRateService;
+import space.gavinklfong.forex.domain.service.ForexTradeService;
 
 import java.time.Duration;
 import java.time.Instant;

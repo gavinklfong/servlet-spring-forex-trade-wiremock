@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>space.gavinklfong</groupId>
 	<artifactId>servlet-spring-forex-trade</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>servlet-spring-forex-trade</name>
 	<description>Servlet Forex Trade</description>
 	<properties>
@@ -24,6 +24,7 @@
 		<au.com.dius.pact.provider.version>4.3.14</au.com.dius.pact.provider.version>
 		<wiremock.version>2.33.2</wiremock.version>
 		<org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+		<common.lang3.version>3.12.0</common.lang3.version>
 
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<springdoc-openapi-maven-plugin.version>1.4</springdoc-openapi-maven-plugin.version>
@@ -91,6 +92,12 @@
 			<groupId>commons-net</groupId>
 			<artifactId>commons-net</artifactId>
 			<version>${commons-net.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${common.lang3.version}</version>
 		</dependency>
 
 
@@ -428,11 +435,6 @@
 							<version>0.2.0</version>
 						</dependency>
 					</annotationProcessorPaths>
-					<compilerArgs>
-						<compilerArg>
-							-Amapstruct.defaultComponentModel=spring
-						</compilerArg>
-					</compilerArgs>
 				</configuration>
 			</plugin>
 		</plugins>

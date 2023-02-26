@@ -16,18 +16,14 @@ import java.util.List;
 
 @Mapper
 public interface ApiModelAdapter {
-    ForexRateBookingApiResponse mapModelToDto(ForexRateBooking forexRateBooking);
-    ForexRateApiResponse mapModelToDto(ForexRate forexRate);
-    List<ForexRateApiResponse> mapModelToForexRateDtoList(List<ForexRate> forexRates);
-    ForexTradeDealApiResponse mapModelToDto(ForexTradeDeal forexTradeDeal);
-    List<ForexTradeDealApiResponse> mapModelToForexTradeDealDtoList(List<ForexTradeDeal> forexTradeDeals);
-    TradeAction mapDtoToModel(ApiTradeAction tradeAction);
-    ForexRateBookingReq mapApiDtoToDto(ForexRateBookingApiRequest forexRateBookingReq);
-    ForexTradeDealReq mapApiDtoToDto(ForexTradeDealApiRequest forexTradeDealReq);
-
-    default Instant map(OffsetDateTime offsetDateTime) {
-        return offsetDateTime.toInstant();
-    }
+    ForexRateBookingApiResponse mapModelToApiResponse(ForexRateBooking forexRateBooking);
+    ForexRateApiResponse mapModelToApiResponse(ForexRate forexRate);
+    List<ForexRateApiResponse> mapModelToForexRateApiResponse(List<ForexRate> forexRates);
+    ForexTradeDealApiResponse mapModelToApiResponse(ForexTradeDeal forexTradeDeal);
+    List<ForexTradeDealApiResponse> mapModelToForexTradeDealApiResponse(List<ForexTradeDeal> forexTradeDeals);
+    TradeAction mapApiDtoToModel(ApiTradeAction tradeAction);
+    ForexRateBookingReq mapApiRequestToDto(ForexRateBookingApiRequest forexRateBookingReq);
+    ForexTradeDealReq mapApiRequestToDto(ForexTradeDealApiRequest forexTradeDealReq);
 
     default OffsetDateTime map(Instant instant) {
         return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());

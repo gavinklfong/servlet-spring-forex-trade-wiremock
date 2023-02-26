@@ -44,7 +44,7 @@ public class ForexTradeDealRestController implements DealApi {
 		}
 				
 		return ResponseEntity.ok().body(
-				mapper.mapModelToForexTradeDealDtoList(tradeService.retrieveTradeDealByCustomer(customerId))
+				mapper.mapModelToForexTradeDealApiResponse(tradeService.retrieveTradeDealByCustomer(customerId))
 		);
 	}
 
@@ -66,8 +66,8 @@ public class ForexTradeDealRestController implements DealApi {
 		
 		// submit trade deal
 		return ResponseEntity.ok().body(
-				mapper.mapModelToDto(
-						tradeService.postTradeDeal(mapper.mapApiDtoToDto(req))
+				mapper.mapModelToApiResponse(
+						tradeService.postTradeDeal(mapper.mapApiRequestToDto(req))
 				)
 		);
 	}

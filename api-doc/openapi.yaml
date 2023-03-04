@@ -1,0 +1,382 @@
+openapi: 3.0.1
+info:
+  title: Forex API
+  description: This is a sample API for the demonstration of foreign exchange trading.
+  version: v0.2
+externalDocs:
+  description: Forex API GitHub
+  url: https://github.com/gavinklfong/servlet-spring-forex-trade-wiremock
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+tags:
+  - name: Rate
+    description: Forex rate retrieval and booking
+  - name: Deal
+    description: Forex trade deal retrieval and submission
+paths:
+  /rates/book:
+    post:
+      tags:
+        - Rate
+      operationId: bookRate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForexRateBookingApiRequest'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForexRateBookingApiResponse'
+  /deals:
+    get:
+      tags:
+        - Deal
+      operationId: getDeals
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForexTradeDealApiResponse'
+    post:
+      tags:
+        - Deal
+      summary: Submit forex trade deal
+      description: "This API submits a forex trading request with amount, rate, trade\
+        \ action and a valid booking reference. The booking reference will be validated\
+        \ in order to make sure the reserved rate is not yet expired. Upon completion,\
+        \ this API will return a response with a deal reference which is a unique\
+        \ reference for record query."
+      operationId: submitDeal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForexTradeDealApiRequest'
+        required: true
+      responses:
+        "400":
+          description: "Invalid request such as unknown customer, invalid rate booking"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: Deal has been submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForexTradeDealApiResponse'
+        "500":
+          description: Server internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+  /rates/latest/{baseCurrency}/{counterCurrency}:
+    get:
+      tags:
+        - Rate
+      summary: Get the latest rate for the specified base currency and counter currency
+      operationId: getLatestRates
+      parameters:
+        - name: baseCurrency
+          in: path
+          required: true
+          schema:
+            type: string
+          example: GBP
+        - name: counterCurrency
+          in: path
+          required: true
+          schema:
+            type: string
+          example: USD
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: Exchange Rate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForexRateApiResponse'
+              examples:
+                GBP/USD rate response:
+                  description: GBP/USD rate response
+                  value:
+                    timestamp: 2022-08-28T21:07:07.908Z
+                    baseCurrency: GBP
+                    counterCurrency: USD
+                    buyRate: 1.25
+                    sellRate: 1.28
+                    spread: 0.03
+                EUR/USD rate response:
+                  description: EUR/USD rate response
+                  value:
+                    timestamp: 2022-08-28T21:07:07.908Z
+                    baseCurrency: EUR
+                    counterCurrency: USD
+                    buyRate: 0.9963
+                    sellRate: 0.9961
+                    spread: 0.02
+  /rates/latest/{baseCurrency}:
+    get:
+      tags:
+        - Rate
+      summary: Get the latest rates for the specified base currency
+      operationId: getLatestRatesByBaseCurrency
+      parameters:
+        - name: baseCurrency
+          in: path
+          required: true
+          schema:
+            type: string
+            example: GBP
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForexRateApiResponse'
+  /rates/latest:
+    get:
+      tags:
+        - Rate
+      summary: Get the latest rates for the specified base currency
+      operationId: getLatestRatesByDefaultBaseCurrency
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForexRateApiResponse'
+  /rates/base-currencies:
+    get:
+      tags:
+        - Rate
+      operationId: getBaseCurrencies
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseErrorBody'
+        "200":
+          description: OK
+          content:
+            'text/plain':
+              schema:
+                type: array
+                items:
+                  type: string
+components:
+  schemas:
+    ApiResponseErrorBody:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiErrorMessage'
+    ApiErrorMessage:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ForexRateBookingApiRequest:
+      required:
+        - baseCurrency
+        - baseCurrencyAmount
+        - counterCurrency
+        - customerId
+        - tradeAction
+      type: object
+      properties:
+        baseCurrency:
+          type: string
+        counterCurrency:
+          type: string
+        baseCurrencyAmount:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+        tradeAction:
+          $ref: '#/components/schemas/ApiTradeAction'
+        customerId:
+          type: integer
+          format: int64
+    ForexRateBookingApiResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        timestamp:
+          type: string
+          format: date-time
+        baseCurrency:
+          type: string
+        counterCurrency:
+          type: string
+        rate:
+          type: number
+          format: double
+        tradeAction:
+          $ref: '#/components/schemas/ApiTradeAction'
+        baseCurrencyAmount:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+        bookingRef:
+          type: string
+        expiryTime:
+          type: string
+          format: date-time
+        customerId:
+          type: integer
+          format: int64
+    ForexTradeDealApiRequest:
+      required:
+        - baseCurrency
+        - baseCurrencyAmount
+        - counterCurrency
+        - customerId
+        - rate
+        - rateBookingRef
+        - tradeAction
+      type: object
+      properties:
+        baseCurrency:
+          type: string
+          example: GBP
+        counterCurrency:
+          type: string
+          example: USD
+        rate:
+          type: number
+          format: double
+          example: 1.25
+        tradeAction:
+          $ref: '#/components/schemas/ApiTradeAction'
+        baseCurrencyAmount:
+          type: number
+          example: 1000
+          minimum: 0
+          exclusiveMinimum: true
+        customerId:
+          type: integer
+          format: int64
+          example: 1
+        rateBookingRef:
+          type: string
+          example: 002c0ed8-2208-4d71-af3f-333ebc867eea
+    ForexTradeDealApiResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 230
+        dealRef:
+          type: string
+          example: 6b19159b-3ff6-42cb-a6a0-cab57da8392a
+        timestamp:
+          type: string
+          format: date-time
+        baseCurrency:
+          type: string
+          example: GBP
+        counterCurrency:
+          type: string
+          example: USD
+        rate:
+          type: number
+          format: double
+          example: 1.25
+        tradeAction:
+          $ref: '#/components/schemas/ApiTradeAction'
+        baseCurrencyAmount:
+          type: number
+          example: 1000
+        customerId:
+          type: integer
+          format: int64
+          example: 1
+    ForexRateApiResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        baseCurrency:
+          type: string
+        counterCurrency:
+          type: string
+        buyRate:
+          type: number
+          format: double
+        sellRate:
+          type: number
+          format: double
+        spread:
+          type: number
+          format: double
+    ApiTradeAction:
+      type: string
+      enum:
+        - BUY
+        - SELL

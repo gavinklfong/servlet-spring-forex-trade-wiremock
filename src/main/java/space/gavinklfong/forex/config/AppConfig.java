@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import space.gavinklfong.forex.services.ForexPricingService;
+import space.gavinklfong.forex.domain.service.ForexPricingService;
 
 import java.io.IOException;
 import java.util.HashMap;

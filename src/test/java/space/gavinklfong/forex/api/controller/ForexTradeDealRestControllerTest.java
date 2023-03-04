@@ -1,4 +1,4 @@
-package space.gavinklfong.forex.controllers;
+package space.gavinklfong.forex.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import reactor.core.publisher.Mono;
+import space.gavinklfong.forex.api.controller.ForexTradeDealRestController;
 import space.gavinklfong.forex.api.dto.ApiResponseErrorBody;
 import space.gavinklfong.forex.api.dto.ApiTradeAction;
 import space.gavinklfong.forex.api.dto.ForexTradeDealApiRequest;

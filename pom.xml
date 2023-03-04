@@ -432,6 +432,7 @@
 								<openApiNullable>false</openApiNullable>
 								<skipDefaultInterface>true</skipDefaultInterface>
 								<useTags>true</useTags>
+								<useJakartaEe>true</useJakartaEe>
 								<documentationProvider>none</documentationProvider>
 							</configOptions>
 						</configuration>

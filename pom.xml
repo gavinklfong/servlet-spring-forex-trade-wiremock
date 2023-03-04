@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>space.gavinklfong</groupId>
 	<artifactId>servlet-spring-forex-trade</artifactId>
-	<version>0.2.1</version>
+	<version>spring-3</version>
 
 	<name>servlet-spring-forex-trade</name>
 	<description>Servlet Forex Trade</description>
@@ -310,6 +310,9 @@
                 <artifactId>jib-maven-plugin</artifactId>
 				<version>${jib-maven-plugin.version}</version>
                 <configuration>
+					<from>
+						<image>openjdk:17-jre</image>
+					</from>
                     <to>
                         <image>${jib.image.path}</image>
                     </to>

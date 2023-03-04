@@ -1,8 +1,10 @@
-FROM adoptopenjdk/openjdk11:ubuntu
+FROM openjdk:17-jdk-slim-buster
 MAINTAINER gavinklfong@gmail.com
 
 # install Node JS and json mock server
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+RUN apt-get update && apt upgrade -y \
+    && apt-get install -y curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g json-server
 

@@ -10,15 +10,10 @@
 	</parent>
 	<groupId>space.gavinklfong</groupId>
 	<artifactId>servlet-spring-forex-trade</artifactId>
-	<version>0.1.0</version>
-	<packaging>pom</packaging>
+	<version>0.2.1</version>
 
 	<name>servlet-spring-forex-trade</name>
 	<description>Servlet Forex Trade</description>
-	<modules>
-		<module>app</module>
-		<module>bdd-tests</module>
-	</modules>
 	<properties>
 		<java.version>17</java.version>
 		<json.version>20220924</json.version>
@@ -36,6 +31,7 @@
 		<maven-cucumber-reporting.version>5.7.4</maven-cucumber-reporting.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
+		<junit-platform.version>1.9.2</junit-platform.version>
 
 		<!--  properties of sonarcloud -->
 		<sonar.projectKey>gavinklfong_servlet-spring-forex-trade</sonar.projectKey>
@@ -170,6 +166,12 @@
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-junit-platform-engine</artifactId>
 			<version>${io.cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<version>${junit-platform.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -394,6 +396,18 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<properties>
+						<configurationParameters>
+							cucumber.junit-platform.naming-strategy=long
+						</configurationParameters>
+					</properties>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

@@ -16,7 +16,7 @@
 	<description>Servlet Forex Trade</description>
 	<properties>
 		<java.version>17</java.version>
-		<json.version>20220924</json.version>
+		<json.version>20230227</json.version>
 		<com.opencsv.version>5.7.1</com.opencsv.version>
 		<org.springdoc.version>1.6.9</org.springdoc.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
@@ -34,6 +34,13 @@
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
 		<junit-platform.version>1.9.2</junit-platform.version>
+		<org.projectlombok.version>1.18.24</org.projectlombok.version>
+		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+		<snakeyaml.version>2.0</snakeyaml.version>
+
+		<dependency-check-maven.version>8.1.2</dependency-check-maven.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 
 		<!--  properties of sonarcloud -->
 		<sonar.projectKey>gavinklfong_servlet-spring-forex-trade</sonar.projectKey>
@@ -208,6 +215,13 @@
 			<version>${org.mapstruct.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snakeyaml.version}</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -304,24 +318,7 @@
 					</systemPropertyVariables>
                 </configuration>
             </plugin>
-            
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-				<version>${jib-maven-plugin.version}</version>
-                <configuration>
-					<from>
-						<image>openjdk:17-jre</image>
-					</from>
-                    <to>
-                        <image>${jib.image.path}</image>
-                    </to>
-                    <container>
-                    	<port>8080</port>
-                    </container>
-                </configuration>
-            </plugin>            
-            
+
 			<plugin>
 			    <groupId>org.jacoco</groupId>
 			    <artifactId>jacoco-maven-plugin</artifactId>
@@ -427,10 +424,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>11</source> <!-- depending on your project -->
-					<target>11</target> <!-- depending on your project -->
+					<source>11</source>
+					<target>11</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>
@@ -440,12 +437,12 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.24</version>
+							<version>${org.projectlombok.version}</version>
 						</path>
 						<dependency>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>
-							<version>0.2.0</version>
+							<version>${lombok-mapstruct-binding.version}</version>
 						</dependency>
 					</annotationProcessorPaths>
 				</configuration>
@@ -453,7 +450,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
+				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<properties>
 						<configurationParameters>
@@ -461,6 +458,18 @@
 						</configurationParameters>
 					</properties>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>${dependency-check-maven.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

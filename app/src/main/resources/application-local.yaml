@@ -1,0 +1,9 @@
+app:
+  forex-rate-api-url: http://localhost:8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/forex
+    username: appuser
+    password: passme
+

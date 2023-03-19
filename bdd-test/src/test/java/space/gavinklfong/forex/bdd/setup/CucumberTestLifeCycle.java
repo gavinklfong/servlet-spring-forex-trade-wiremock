@@ -4,10 +4,9 @@ package space.gavinklfong.forex.bdd.setup;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.BeforeAll;
 import lombok.RequiredArgsConstructor;
-import space.gavinklfong.forex.bdd.dto.Customer;
 import space.gavinklfong.forex.bdd.service.CustomerRepo;
+import space.gavinklfong.forex.bdd.service.ForexTradeDealRepo;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,20 +17,17 @@ public class CucumberTestLifeCycle {
     private final EnvSetup envSetup;
 
     private final CustomerRepo customerRepo;
-
-    @BeforeAll
-    void setup() throws MalformedURLException {
-//        MockApiSetup.start();
-        connectToWireMock();
-    }
+    private final ForexTradeDealRepo forexTradeDealRepo;
 
     @Before
-    void beforeEachScenario() {
+    public void beforeEachScenario() throws MalformedURLException {
+        connectToWireMock();
         customerRepo.deleteAll();
+        forexTradeDealRepo.deleteAll();
     }
 
     @After
-    void cleanUp() {
+    public void cleanUp() {
         WireMock.reset();
     }
 

@@ -19,8 +19,7 @@ public class AppClient {
     private final String appUrl;
 
 
-    public AppClient(EnvSetup envSetup,
-                     TestContext testContext) {
+    public AppClient(EnvSetup envSetup) {
         this.appUrl = envSetup.getAppUrl();
     }
 
@@ -46,5 +45,15 @@ public class AppClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    @SneakyThrows
+    public HttpResponse<String> submitForexDeal(JSONObject requestBody) {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest
+                .newBuilder(new URI(appUrl + "/deals"))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
 
 }

@@ -4,23 +4,22 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import space.gavinklfong.forex.bdd.dto.Customer;
+import space.gavinklfong.forex.bdd.dto.ForexTradeDeal;
 import space.gavinklfong.forex.bdd.service.AppClient;
 import space.gavinklfong.forex.bdd.service.CustomerRepo;
+import space.gavinklfong.forex.bdd.service.ForexTradeDealRepo;
 import space.gavinklfong.forex.bdd.setup.EnvSetup;
 import space.gavinklfong.forex.bdd.setup.TestContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -33,7 +32,8 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 //@Slf4j
 //@RequiredArgsConstructor
@@ -44,6 +44,7 @@ public class StepDef {
 	private final TestContext testContext;
 
 	private final CustomerRepo customerRepo;
+	private final ForexTradeDealRepo forexTradeDealRepo;
 
 	private final AppClient appClient;
 
@@ -57,14 +58,16 @@ public class StepDef {
 	public StepDef(EnvSetup envSetup,
 				   TestContext testContext,
 				   AppClient appClient,
-				   CustomerRepo customerRepo) {
+				   CustomerRepo customerRepo,
+				   ForexTradeDealRepo forexTradeDealRepo) {
 		this.apiServiceUrl = envSetup.getAppUrl();
 		this.testContext = testContext;
 		this.appClient = appClient;
 		this.customerRepo = customerRepo;
+		this.forexTradeDealRepo = forexTradeDealRepo;
 	}
 
-	@Given("forex rate is available for base currency {string}")
+	@Given("Forex rate available for base currency {string}")
 	public void forex_rate_is_available_for_base_currency(String base) {
 		stubFor(get(urlPathEqualTo(String.format("%s/%s", "/rates", base)))
 				.willReturn(aResponse()
@@ -75,8 +78,8 @@ public class StepDef {
 		);
 	}
 
-	@Given("Customer saved in database:")
-	public void customerInDatabase(DataTable dataTable) {
+	@Given("Existing customers:")
+	public void customersInDatabase(DataTable dataTable) {
 		List<Map<String, String>> records = dataTable.asMaps(String.class, String.class);
 		records.stream()
 				.map(record -> Customer.builder()
@@ -84,10 +87,28 @@ public class StepDef {
 						.name(record.get("name"))
 						.tier(Integer.parseInt(record.get("tier")))
 						.build())
-				.forEach(customerRepo::save);
+				.forEach(customerRepo::insert);
 	}
 
-	@Given("forex rate is available for base currency {string} and counter currency {string}")
+	@Given("Existing forex trade deals:")
+	public void ForexTradeDealsInDatabase(DataTable dataTable) {
+		List<Map<String, String>> records = dataTable.asMaps(String.class, String.class);
+		records.stream()
+				.map(record -> ForexTradeDeal.builder()
+						.id(Long.parseLong(record.get("id")))
+						.baseCurrency(record.get("baseCurrency"))
+						.counterCurrency(record.get("counterCurrency"))
+						.baseCurrencyAmount(new BigDecimal(record.get("baseCurrencyAmount")))
+						.customerId(Long.parseLong(record.get("customerId")))
+						.dealRef(record.get("dealRef"))
+						.rate(Double.parseDouble(record.get("rate")))
+						.timestamp(Instant.parse(record.get("timestamp")))
+						.tradeAction(record.get("tradeAction"))
+						.build())
+				.forEach(forexTradeDealRepo::insert);
+	}
+
+	@Given("Forex rate available for base currency {string} and counter currency {string}")
 	public void forex_rate_is_available_for_base_currency(String base, String counter) {
 		stubFor(get(urlPathEqualTo(String.format("%s/%s-%s", "/rates", base, counter)))
 				.willReturn(aResponse()
@@ -104,13 +125,13 @@ public class StepDef {
 		}
 	}
 
-	@When("I request for the latest rate with base currency {string}")
+	@When("Request for the latest rate with base currency {string}")
 	public void i_request_for_the_latest_rate_with_base_currency(String base) throws URISyntaxException, IOException, InterruptedException {
 		testContext.setBaseCurrency(base);
 		testContext.setResponse(appClient.getForexRates(base));
 	}
 	
-	@Then("I should receive list of currency rate")
+	@Then("Receive currency rates")
 	public void i_should_receive_list_of_currency_rate() {
 
 		assertThat(testContext.getResponse()).extracting(HttpResponse::statusCode).isEqualTo(200);
@@ -127,7 +148,7 @@ public class StepDef {
 		});
 	}
 	
-	@When("I request for a rate booking with parameters: {string}, {string}, {string}, {long}, {long}")
+	@When("Request for a rate booking with parameters: {string}, {string}, {string}, {long}, {long}")
 	public void i_request_for_a_rate_booking_with_parameters(String base, String counter, String tradeAction, Long amount, Long customerId) throws URISyntaxException, IOException, InterruptedException {
 
 		JSONObject rateBookingReq = new JSONObject();
@@ -139,15 +160,16 @@ public class StepDef {
 
 		testContext.setBaseCurrency(base);
 		testContext.setCounterCurrency(counter);
-		testContext.setResponse(appClient.bookForexRate(rateBookingReq));
+		HttpResponse<String> response = appClient.bookForexRate(rateBookingReq);
+		testContext.setResponse(response);
 	}
 	
-	@Then("I should receive a valid rate booking")
+	@Then("Receive a valid rate booking")
 	public void i_should_receive_a_valid_rate_booking() {
 
 		assertThat(testContext.getResponse()).extracting(HttpResponse::statusCode).isEqualTo(200);
 
-		JSONObject json = new JSONObject(testContext.getResponse());
+		JSONObject json = new JSONObject(testContext.getResponse().body());
 
 		assertThat(json.getDouble("rate")).isPositive();
 		assertThat(json.getString("baseCurrency")).isEqualTo(testContext.getBaseCurrency());
@@ -160,7 +182,7 @@ public class StepDef {
 		testContext.setRateBooking(json);
 	}	
 	
-	@When("I submit a forex trade deal with rate booking and parameters: {string}, {string}, {string}, {long}, {long}")
+	@When("Submit a forex trade deal with rate booking and parameters: {string}, {string}, {string}, {long}, {long}")
 	public void i_submit_a_forex_trade_deal_with_rate_booking_and_parameters(String base, String counter, String tradeAction, Long amount, Long customerId) throws URISyntaxException, IOException, InterruptedException {
 		
 		JSONObject tradeDeal = new JSONObject();
@@ -169,34 +191,27 @@ public class StepDef {
 		tradeDeal.put("tradeAction", tradeAction);
 		tradeDeal.put("baseCurrencyAmount", amount);
 		tradeDeal.put("customerId", customerId);
-		tradeDeal.put("rateBookingRef", rateBooking.getString("bookingRef"));
-		tradeDeal.put("rate", rateBooking.getDouble("rate"));
-		
-		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest
-				.newBuilder(new URI(apiServiceUrl + "/deals"))
-				.POST(HttpRequest.BodyPublishers.ofString(tradeDeal.toString()))
-				.header("accept", "application/json")
-				.header("Content-Type", "application/json")
-				.build();	
-		this.response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		tradeDeal.put("rateBookingRef", testContext.getRateBooking().getString("bookingRef"));
+		tradeDeal.put("rate", testContext.getRateBooking().getDouble("rate"));
+
+		testContext.setResponse(appClient.submitForexDeal(tradeDeal));
 	}
 	
-	@Then("I should get the forex trade deal successfully posted")
+	@Then("Receive a valid forex trade deal response")
 	public void i_should_get_the_forex_trade_deal_successfully_posted() {
+
+		assertThat(testContext.getResponse()).extracting(HttpResponse::statusCode).isEqualTo(200);
 		
-		assertEquals(200, response.statusCode());
-		
-		JSONObject json = new JSONObject(response.body());
-		
-		assertEquals(baseCurrency, json.getString("baseCurrency"));
-		assertEquals(counterCurrency, json.getString("counterCurrency"));
-		assertEquals(rateBooking.getDouble("rate"), json.getDouble("rate"));
-		assertTrue(json.getString("dealRef").trim().length() > 0);
-		assertTrue(json.getLong("id") > 0);		
+		JSONObject json = new JSONObject(testContext.getResponse().body());
+
+		assertThat(json.getString("baseCurrency")).isEqualTo(testContext.getBaseCurrency());
+		assertThat(json.getString("counterCurrency")).isEqualTo(testContext.getCounterCurrency());
+		assertThat(json.getDouble("rate")).isEqualTo(testContext.getRateBooking().getDouble("rate"));
+		assertThat(json.getString("dealRef")).isNotEmpty();
+		assertThat(json.getLong("id")).isPositive();
 	}
 	
-	@When("I request for forex trade deal by {long}")
+	@When("Request for forex trade deal by {long}")
 	public void i_request_for_forex_trade_deal_by(Long customerId) throws URISyntaxException, IOException, InterruptedException {
 		// Send request to get the latest rates
 		HttpClient client = HttpClient.newHttpClient();
@@ -206,7 +221,7 @@ public class StepDef {
 		this.response = client.send(request, HttpResponse.BodyHandlers.ofString());			
 	}
 	
-	@Then("I should get a list of forex trade deal for {long}")
+	@Then("Receive a list of forex trade deal for {long}")
 	public void i_should_get_a_list_of_forex_trade_deal_for(Long customer) {
 		
 		JSONArray jsonArray = new JSONArray(response.body());

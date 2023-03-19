@@ -32,6 +32,7 @@ public class ForexTradeDeal {
 	
 	private Double rate;
 
+	@Enumerated(EnumType.STRING)
 	private TradeAction tradeAction;
 
 	private BigDecimal baseCurrencyAmount;

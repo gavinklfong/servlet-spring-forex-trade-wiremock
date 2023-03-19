@@ -1,22 +1,28 @@
 package space.gavinklfong.forex.bdd.setup;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import javax.sql.DataSource;
 
 @ComponentScan("space.gavinklfong.forex.bdd")
 @Configuration
-@EnableJpaRepositories
 @PropertySource("classpath:application.properties")
 public class SpringConfig {
 
-//    @Bean
-//    public Datasource datasource() {
-//
-//    }
+    @Bean
+    public DataSource datasource(EnvSetup envSetup) {
+        DataSourceBuilder builder = DataSourceBuilder.create();
+        builder.driverClassName("com.mysql.cj.jdbc.Driver");
+        builder.url(envSetup.getMySQLJdbcUrl());
+        builder.username(envSetup.getMySQLUser());
+        builder.password(envSetup.getMySQLPassword());
+        return builder.build();
+    }
 
     @Bean
     @ConditionalOnProperty(name = "env.local", havingValue = "false")

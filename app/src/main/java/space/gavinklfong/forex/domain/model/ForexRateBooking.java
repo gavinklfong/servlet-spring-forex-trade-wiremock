@@ -25,6 +25,8 @@ public class ForexRateBooking {
 	private String baseCurrency;
 	private String counterCurrency;
 	private Double rate;
+
+	@Enumerated(EnumType.STRING)
 	private TradeAction tradeAction;
 	private BigDecimal baseCurrencyAmount;
 	
@@ -57,12 +59,5 @@ public class ForexRateBooking {
 		this.bookingRef = bookingRef;
 	}
 
-	public ForexRateBooking(String baseCurrency, String counterCurrency, BigDecimal baseCurrencyAmount, Long customerId) {
-		super();
-		this.baseCurrency = baseCurrency;
-		this.counterCurrency = counterCurrency;
-		this.baseCurrencyAmount = baseCurrencyAmount;
-		this.customerId = customerId;
-	}
 
 }

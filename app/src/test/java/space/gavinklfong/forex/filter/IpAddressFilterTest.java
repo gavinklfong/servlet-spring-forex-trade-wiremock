@@ -26,7 +26,7 @@ class IpAddressFilterTest {
 
     @BeforeEach
     void setUp() {
-        filter = new IpAddressFilter(IP_RANGES);
+        filter = new IpAddressFilter(IP_RANGES, true);
     }
 
     @Test

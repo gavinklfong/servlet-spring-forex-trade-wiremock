@@ -6,7 +6,9 @@ app:
   default-base-currency: GBP
   default-additional-pip: 1
   forex-rate-api-url: http://localhost:3000
-  allowed-ip-range: 127.0.0.1
+  ip-filter:
+    allowed-ip-range: 127.0.0.1
+    enabled: false
 
 debug: false
 

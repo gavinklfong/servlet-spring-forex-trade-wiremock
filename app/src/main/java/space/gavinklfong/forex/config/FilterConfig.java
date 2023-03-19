@@ -14,13 +14,16 @@ import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 @Configuration
 public class FilterConfig {
 
-    @Value("${app.allowed-ip-range:}")
+    @Value("${app.ip-filter.allowed-ip-range:}")
     private List<String> allowedIpRanges;
+
+    @Value("${app.ip-filter.enabled:false}")
+    private Boolean ipFilterEnabled;
 
     @Bean
     public FilterRegistrationBean ipAddressFilter() {
         FilterRegistrationBean filterReg = new FilterRegistrationBean();
-        filterReg.setFilter(new IpAddressFilter(allowedIpRanges));
+        filterReg.setFilter(new IpAddressFilter(allowedIpRanges, ipFilterEnabled));
         filterReg.addUrlPatterns("/deals");
         filterReg.setOrder(HIGHEST_PRECEDENCE + 1);
         return filterReg;

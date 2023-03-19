@@ -218,13 +218,15 @@ public class StepDef {
 		HttpRequest request = HttpRequest
 				.newBuilder(new URI(apiServiceUrl + "/deals?customerId=" + customerId))
 				.header("accept", "application/json").build();	
-		this.response = client.send(request, HttpResponse.BodyHandlers.ofString());			
+		testContext.setResponse(client.send(request, HttpResponse.BodyHandlers.ofString()));
 	}
 	
 	@Then("Receive a list of forex trade deal for {long}")
 	public void i_should_get_a_list_of_forex_trade_deal_for(Long customer) {
+
+		assertThat(testContext.getResponse()).extracting(HttpResponse::statusCode).isEqualTo(200);
 		
-		JSONArray jsonArray = new JSONArray(response.body());
+		JSONArray jsonArray = new JSONArray(testContext.getResponse().body());
 		
 		assertTrue(jsonArray.length() > 0);
 		jsonArray.forEach(item -> {

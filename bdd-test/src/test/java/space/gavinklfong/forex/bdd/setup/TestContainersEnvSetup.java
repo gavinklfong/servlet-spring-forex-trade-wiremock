@@ -9,6 +9,8 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 public class TestContainersEnvSetup implements EnvSetup {
@@ -18,20 +20,19 @@ public class TestContainersEnvSetup implements EnvSetup {
     private static final int APP_PORT = 9090;
     private static final int WIREMOCK_PORT = 8080;
     private static final int MYSQL_PORT = 3306;
-    private static final String MYSQL_USER = "root";
+    private static final String MYSQL_USER = "appuser";
     private static final String MYSQL_PASSWORD = "passme";
     private static final String MYSQL_DATABASE = "forex";
-    private static final String MYSQL_INIT_SCRIPT = "resources/mysql_init.sql";
     private static final String MYSQL_ALIAS = "mysql";
     private static final String WIREMOCK_ALIAS = "wiremock";
 
     private static final GenericContainer<?> WIREMOCK_CONTAINER = new GenericContainer<>(
-            DockerImageName.parse("wiremock/wiremock").withTag("latest"))
-            .withCommand("/docker-entry.sh", "--verbose");
+            DockerImageName.parse("wiremock/wiremock").withTag("latest"));
+//            .withCommand("/docker-entry.sh", "--verbose");
     private static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(
             DockerImageName.parse("mysql").withTag("5.7"));
     private static final GenericContainer<?> APP_CONTAINER = new GenericContainer<>(
-            DockerImageName.parse(APP_IMAGE_NAME).withTag("latest"));
+            DockerImageName.parse(APP_IMAGE_NAME).withTag("spring-3"));
     private static final Network NETWORK = Network.newNetwork();
 
     public void initialize() {
@@ -57,7 +58,7 @@ public class TestContainersEnvSetup implements EnvSetup {
                 .withDatabaseName(MYSQL_DATABASE)
                 .withUsername(MYSQL_USER)
                 .withPassword(MYSQL_PASSWORD)
-                .withInitScript(MYSQL_INIT_SCRIPT)
+                .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_PASSWORD)
                 .start();
         MYSQL_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(TestContainersEnvSetup.class)));
     }
@@ -65,10 +66,12 @@ public class TestContainersEnvSetup implements EnvSetup {
     private void initializeAppContainer() {
         APP_CONTAINER
                 .withNetwork(NETWORK)
-                .withEnv("SPRING_DATASOURCE_URL", String.format("jdbc:mysql://%s:%d/%s", MYSQL_ALIAS, MYSQL_PORT, MYSQL_DATABASE))
-                .withEnv("APP_FOREX_RATE_API_URL",
-                        String.format("http://%s:%d", WIREMOCK_ALIAS, WIREMOCK_PORT))
-                .withEnv("SERVER_PORT", String.valueOf(APP_PORT))
+                .withEnv(Map.of("SPRING_DATASOURCE_URL", String.format("jdbc:mysql://%s:%d/%s", MYSQL_ALIAS, MYSQL_PORT, MYSQL_DATABASE),
+                                "SPRING_DATASOURCE_USERNAME", "root",
+                                "SPRING_DATASOURCE_PASSWORD", MYSQL_PASSWORD,
+                                "APP_FOREX_RATE_API_URL", String.format("http://%s:%d", WIREMOCK_ALIAS, WIREMOCK_PORT),
+                                "APP_IP_FILER_ENABLED", "false",
+                                "SERVER_PORT", String.valueOf(APP_PORT)))
                 .withExposedPorts(APP_PORT)
                 .start();
 

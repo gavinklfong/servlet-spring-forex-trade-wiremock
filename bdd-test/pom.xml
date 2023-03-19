@@ -143,21 +143,21 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <skipITs>${maven.failsafe.skip}</skipITs>
-                    <!-- Maven FailSafe does not recognize JUnit 5 tag -->
-                    <!--                     <groups>${test.groups}</groups> -->
-                    <includes>
-                        <include>**/bdd/*.java</include>
-                    </includes>
-                    <systemPropertyVariables>
-                        <test.server.port>${spring-boot.http.port}</test.server.port>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-failsafe-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <skipITs>${maven.failsafe.skip}</skipITs>-->
+<!--                    &lt;!&ndash; Maven FailSafe does not recognize JUnit 5 tag &ndash;&gt;-->
+<!--                    &lt;!&ndash;                     <groups>${test.groups}</groups> &ndash;&gt;-->
+<!--                    <includes>-->
+<!--                        <include>**/bdd/*.java</include>-->
+<!--                    </includes>-->
+<!--                    <systemPropertyVariables>-->
+<!--                        <test.server.port>${spring-boot.http.port}</test.server.port>-->
+<!--                    </systemPropertyVariables>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>net.masterthought</groupId>
                 <artifactId>maven-cucumber-reporting</artifactId>

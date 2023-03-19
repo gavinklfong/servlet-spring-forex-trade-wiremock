@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: passme
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: passme
+      MYSQL_DATABASE: forex
+#    volumes:
+#      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+  wiremock:
+    image: wiremock/wiremock:latest
+    ports:
+      - "8080:8080"

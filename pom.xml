@@ -24,7 +24,7 @@
 		<java.version>17</java.version>
 		<json.version>20230227</json.version>
 		<com.opencsv.version>5.7.1</com.opencsv.version>
-		<org.springdoc.version>1.6.9</org.springdoc.version>
+		<org.springdoc.version>1.6.14</org.springdoc.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-net.version>3.9.0</commons-net.version>
 		<io.cucumber.version>7.11.1</io.cucumber.version>

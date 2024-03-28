@@ -83,9 +83,7 @@ public class ForexPricingService {
 	}
 
 	private double roundDecimal(double value, int decimalPlaces) {
-
 		double factor = Math.pow(10, decimalPlaces);
-
 		return Math.round(value * factor) / factor;
 	}
 

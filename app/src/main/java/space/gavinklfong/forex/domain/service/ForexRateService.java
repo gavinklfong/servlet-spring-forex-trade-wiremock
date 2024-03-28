@@ -127,6 +127,8 @@ public class ForexRateService {
      */
     public ForexRateBooking obtainBooking(ForexRateBookingReq request) {
 
+        log.info("handle booking for customer: {}", request.getCustomerId());
+
         List<ForexPricing> forexPricingList = forexPriceService.findCounterCurrencies(request.getBaseCurrency());
         if (forexPricingList.stream().noneMatch(p -> p.getCounterCurrency().equalsIgnoreCase(request.getCounterCurrency()))) {
             throw new InvalidRequestException("currency", "unknown currency pair");
@@ -140,15 +142,10 @@ public class ForexRateService {
                         request.getCounterCurrency(),
                         rate);
 
-        Optional<Customer> customer = customerRepo.findById(request.getCustomerId());
-
-        if (customer.isPresent()) {
-            ForexRateBooking rateBooking = buildRateBookingRecord(request, adjustRateForCustomerTier(rateWithPrice, customer.get()));
-            return rateBookingRepo.save(rateBooking);
-        } else {
-            throw new UnknownCustomerException();
-        }
-
+        return customerRepo.findById(request.getCustomerId())
+                .map(customer -> buildRateBookingRecord(request, adjustRateForCustomerTier(rateWithPrice, customer)))
+                .map(rateBookingRepo::save)
+                .orElseThrow(UnknownCustomerException::new);
     }
 
     private ForexRate adjustRateForCustomerTier(ForexRate rate, Customer customer) {
@@ -197,8 +194,8 @@ public class ForexRateService {
         }
 
         // Check currency pair
-        if (!record.getBaseCurrency().equalsIgnoreCase(rateBooking.getBaseCurrency())
-                || !record.getCounterCurrency().equalsIgnoreCase(rateBooking.getCounterCurrency())) {
+        if (!(record.getBaseCurrency().equalsIgnoreCase(rateBooking.getBaseCurrency())
+                && record.getCounterCurrency().equalsIgnoreCase(rateBooking.getCounterCurrency()))) {
             return false;
         }
 
@@ -207,6 +204,8 @@ public class ForexRateService {
     }
 
     private ForexRateBooking buildRateBookingRecord(ForexRateBookingReq request, ForexRate rate) {
+
+        log.info("build rate booking record for customer: {} with rate {}", request.getCustomerId(), rate);
 
         Instant timestamp = Instant.now();
         Instant expiryTime = timestamp.plusSeconds(bookingDuration);

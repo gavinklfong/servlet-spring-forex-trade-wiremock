@@ -37,10 +37,11 @@ public class ForexRateApiClient {
 
     public ForexRateApiResponse fetchLatestRate(String baseCurrency, String counterCurrency) {
 
-        log.debug("fetchLatestRates() - baseUrl = " + forexApiUrl);
+        String uri = String.format("/rates/%s-%s", baseCurrency, counterCurrency);
 
+        log.info("fetch latest rate from {} with uri {}", forexApiUrl, uri);
 
-        return webClient.get().uri("/rates/{base}-{counter}", baseCurrency, counterCurrency)
+        return webClient.get().uri(uri)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(ForexRateApiResponse.class)

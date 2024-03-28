@@ -47,7 +47,14 @@ public class ForexTradeService {
 		if (customer.isEmpty())
 			throw new UnknownCustomerException();
 
-		ForexRateBooking rateBooking = new ForexRateBooking(req.getBaseCurrency(), req.getCounterCurrency(), req.getRate(), req.getBaseCurrencyAmount(), req.getRateBookingRef());
+		ForexRateBooking rateBooking = ForexRateBooking.builder()
+				.baseCurrency(req.getBaseCurrency())
+				.counterCurrency(req.getCounterCurrency())
+				.rate(req.getRate())
+				.baseCurrencyAmount(req.getBaseCurrencyAmount())
+				.bookingRef(req.getRateBookingRef())
+				.build();
+
 		if (rateService.validateRateBooking(rateBooking)) {
 			// build and save trade deal record
 			return tradeDealRepo.save(

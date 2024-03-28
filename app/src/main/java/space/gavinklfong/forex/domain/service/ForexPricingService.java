@@ -20,10 +20,6 @@ public class ForexPricingService {
 
 	private final List<ForexPricing> forexPricingList = new ArrayList<>();
 
-	public ForexPricingService() {
-		super();
-	}
-
 	public ForexPricingService(InputStream inStream) throws CsvValidationException, IOException {
 
 		log.debug("initialize...");

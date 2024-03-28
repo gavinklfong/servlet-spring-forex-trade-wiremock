@@ -1,6 +1,6 @@
 package space.gavinklfong.forex.api.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import space.gavinklfong.forex.api.DealApi;
@@ -16,14 +16,14 @@ import space.gavinklfong.forex.mapper.ApiModelAdapter;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 public class ForexTradeDealRestController implements DealApi {
 
 	private static final ApiModelAdapter mapper = ApiModelAdapter.INSTANCE;
 
-	@Autowired
-	private ForexTradeService tradeService;
-	
+	private final ForexTradeService tradeService;
+
 	/**
 	 * Expose API for customers to retrieve their forex trade deals
 	 * 

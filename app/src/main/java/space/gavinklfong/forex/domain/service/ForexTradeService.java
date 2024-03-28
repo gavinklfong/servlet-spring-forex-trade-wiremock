@@ -1,6 +1,6 @@
 package space.gavinklfong.forex.domain.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import space.gavinklfong.forex.domain.dto.ForexTradeDealReq;
 import space.gavinklfong.forex.domain.model.Customer;
@@ -17,17 +17,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+@RequiredArgsConstructor
 @Component
 public class ForexTradeService {
-
-	@Autowired
-	private ForexTradeDealRepo tradeDealRepo;
-	
-	@Autowired
-	private CustomerRepo customerRepo;
-	
-	@Autowired
-	private ForexRateService rateService;
+	private final ForexTradeDealRepo tradeDealRepo;
+	private final CustomerRepo customerRepo;
+	private final ForexRateService rateService;
 
 	/**
 	 * This method process forex trade deal submission. It carries out the following validation:
@@ -79,9 +74,7 @@ public class ForexTradeService {
 	 * @return List of trade deal wrapped in Flux data type
 	 */
 	public List<ForexTradeDeal> retrieveTradeDealByCustomer(Long customerId) {
-		
 		return tradeDealRepo.findByCustomerId(customerId);
-
 	}
 	
 }

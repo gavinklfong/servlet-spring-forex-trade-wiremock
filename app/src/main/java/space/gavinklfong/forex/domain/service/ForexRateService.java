@@ -1,5 +1,6 @@
 package space.gavinklfong.forex.domain.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,27 +25,27 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.compare.ComparableUtils.is;
 
-import static org.apache.commons.lang3.compare.ComparableUtils.is;
-
 @Slf4j
 @Component
 public class ForexRateService {
 
-    @Value("${app.rate-booking-duration}")
-    private long bookingDuration = 120L;
+    private final long bookingDuration;
+    private final ForexRateApiClient forexRateApiClient;
+    private final ForexRateBookingRepo rateBookingRepo;
+    private final CustomerRepo customerRepo;
+    private final ForexPricingService forexPriceService;
 
-    @Autowired
-    private ForexRateApiClient forexRateApiClient;
-
-    @Autowired
-    private ForexRateBookingRepo rateBookingRepo;
-
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    @Autowired
-    private ForexPricingService forexPriceService;
-
+    public ForexRateService(@Value("${app.rate-booking-duration:120}") long bookingDuration,
+                            ForexRateApiClient forexRateApiClient,
+                            ForexRateBookingRepo rateBookingRepo,
+                            CustomerRepo customerRepo,
+                            ForexPricingService forexPriceService) {
+        this.bookingDuration = bookingDuration;
+        this.forexRateApiClient = forexRateApiClient;
+        this.rateBookingRepo = rateBookingRepo;
+        this.customerRepo = customerRepo;
+        this.forexPriceService = forexPriceService;
+    }
 
     /**
      * Retrieve the latest rates for list of counter currencies

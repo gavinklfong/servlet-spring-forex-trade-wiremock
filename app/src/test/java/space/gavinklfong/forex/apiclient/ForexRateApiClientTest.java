@@ -3,6 +3,7 @@ package space.gavinklfong.forex.apiclient;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +27,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Slf4j
 @WireMockTest
-@ExtendWith(SpringExtension.class)
 @Tag("UnitTest")
 class ForexRateApiClientTest {
+
+    private ForexRateApiClient forexRateApiClient;
+
+    @BeforeEach
+    void setup(WireMockRuntimeInfo wireMockRuntimeInfo) {
+        forexRateApiClient = new ForexRateApiClient(wireMockRuntimeInfo.getHttpBaseUrl());
+    }
 
     @Test
     void getLatestRate(WireMockRuntimeInfo wmRuntimeInfo) {
@@ -39,13 +46,11 @@ class ForexRateApiClientTest {
                         .withBodyFile("getLatestRatesMockResponse.json")));
 
         // Initialize API client and trigger request
-        ForexRateApiClient forexRateApiClient = new ForexRateApiClient(wmRuntimeInfo.getHttpBaseUrl());
         ForexRateApiResponse response = forexRateApiClient.fetchLatestRates("GBP");
 
         // Assert response
-        ForexRateApiResponse rawData = response;
-        assertThat(rawData).extracting(ForexRateApiResponse::getBase).isEqualTo("GBP");
-        assertThat(rawData.getRates()).hasSize(4)
+        assertThat(response).returns("GBP", ForexRateApiResponse::getBase);
+        assertThat(response.getRates()).hasSize(4)
                 .containsOnlyKeys("USD", "EUR", "CAD", "JPY");
 	}
 
@@ -58,13 +63,11 @@ class ForexRateApiClientTest {
                         .withBodyFile("getLatestUSDRateMockResponse.json")));
 
         // Initialize API client and trigger request
-        ForexRateApiClient forexRateApiClient = new ForexRateApiClient(wmRuntimeInfo.getHttpBaseUrl());
         ForexRateApiResponse response = forexRateApiClient.fetchLatestRate("GBP", "USD");
 
         // Assert response
-        ForexRateApiResponse rawData = response;
-        assertThat(rawData).extracting(ForexRateApiResponse::getBase).isEqualTo("GBP");
-        assertThat(rawData.getRates()).hasSize(1)
+        assertThat(response).returns("GBP", ForexRateApiResponse::getBase);
+        assertThat(response.getRates()).hasSize(1)
                 .containsEntry("USD", 1.3923701653);
 	}
 }

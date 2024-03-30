@@ -6,11 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import space.gavinklfong.forex.apiclient.dto.ForexRateApiResponse;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -38,7 +36,7 @@ class ForexRateApiClientTest {
     }
 
     @Test
-    void getLatestRate(WireMockRuntimeInfo wmRuntimeInfo) {
+    void getLatestRate() {
 
         stubFor(get("/rates/GBP").willReturn(
                 aResponse().withStatus(HttpStatus.OK.value())
@@ -55,7 +53,7 @@ class ForexRateApiClientTest {
 	}
 
     @Test
-    void getUSDRate(WireMockRuntimeInfo wmRuntimeInfo) {
+    void getUSDRate() {
 
         stubFor(get("/rates/GBP-USD").willReturn(
                 aResponse().withStatus(HttpStatus.OK.value())

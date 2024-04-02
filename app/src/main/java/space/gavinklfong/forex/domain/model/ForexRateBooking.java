@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "forex_rate_booking")
 public class ForexRateBooking {
@@ -39,7 +39,6 @@ public class ForexRateBooking {
 
 	public ForexRateBooking(Long id, Instant timestamp, String baseCurrency, String counterCurrency, Double rate,
 							String bookingRef, Instant expiryTime, Long customerId) {
-		super();
 		this.id = id;
 		this.timestamp = timestamp;
 		this.baseCurrency = baseCurrency;
@@ -49,15 +48,4 @@ public class ForexRateBooking {
 		this.expiryTime = expiryTime;
 		this.customerId = customerId;
 	}
-
-	public ForexRateBooking(String baseCurrency, String counterCurrency, Double rate, BigDecimal baseCurrencyAmount, String bookingRef) {
-		super();
-		this.baseCurrency = baseCurrency;
-		this.counterCurrency = counterCurrency;
-		this.rate = rate;
-		this.baseCurrencyAmount = baseCurrencyAmount;
-		this.bookingRef = bookingRef;
-	}
-
-
 }

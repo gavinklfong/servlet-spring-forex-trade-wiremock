@@ -1,5 +1,6 @@
 package space.gavinklfong.forex.domain.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,27 +25,27 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.compare.ComparableUtils.is;
 
-import static org.apache.commons.lang3.compare.ComparableUtils.is;
-
 @Slf4j
 @Component
 public class ForexRateService {
 
-    @Value("${app.rate-booking-duration}")
-    private long bookingDuration = 120L;
+    private final long bookingDuration;
+    private final ForexRateApiClient forexRateApiClient;
+    private final ForexRateBookingRepo rateBookingRepo;
+    private final CustomerRepo customerRepo;
+    private final ForexPricingService forexPriceService;
 
-    @Autowired
-    private ForexRateApiClient forexRateApiClient;
-
-    @Autowired
-    private ForexRateBookingRepo rateBookingRepo;
-
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    @Autowired
-    private ForexPricingService forexPriceService;
-
+    public ForexRateService(@Value("${app.rate-booking-duration:120}") long bookingDuration,
+                            ForexRateApiClient forexRateApiClient,
+                            ForexRateBookingRepo rateBookingRepo,
+                            CustomerRepo customerRepo,
+                            ForexPricingService forexPriceService) {
+        this.bookingDuration = bookingDuration;
+        this.forexRateApiClient = forexRateApiClient;
+        this.rateBookingRepo = rateBookingRepo;
+        this.customerRepo = customerRepo;
+        this.forexPriceService = forexPriceService;
+    }
 
     /**
      * Retrieve the latest rates for list of counter currencies
@@ -126,6 +127,8 @@ public class ForexRateService {
      */
     public ForexRateBooking obtainBooking(ForexRateBookingReq request) {
 
+        log.info("handle booking for customer: {}, request: {}", request.getCustomerId(), request);
+
         List<ForexPricing> forexPricingList = forexPriceService.findCounterCurrencies(request.getBaseCurrency());
         if (forexPricingList.stream().noneMatch(p -> p.getCounterCurrency().equalsIgnoreCase(request.getCounterCurrency()))) {
             throw new InvalidRequestException("currency", "unknown currency pair");
@@ -139,15 +142,10 @@ public class ForexRateService {
                         request.getCounterCurrency(),
                         rate);
 
-        Optional<Customer> customer = customerRepo.findById(request.getCustomerId());
-
-        if (customer.isPresent()) {
-            ForexRateBooking rateBooking = buildRateBookingRecord(request, adjustRateForCustomerTier(rateWithPrice, customer.get()));
-            return rateBookingRepo.save(rateBooking);
-        } else {
-            throw new UnknownCustomerException();
-        }
-
+        return customerRepo.findById(request.getCustomerId())
+                .map(customer -> buildRateBookingRecord(request, adjustRateForCustomerTier(rateWithPrice, customer)))
+                .map(rateBookingRepo::save)
+                .orElseThrow(UnknownCustomerException::new);
     }
 
     private ForexRate adjustRateForCustomerTier(ForexRate rate, Customer customer) {
@@ -196,8 +194,8 @@ public class ForexRateService {
         }
 
         // Check currency pair
-        if (!record.getBaseCurrency().equalsIgnoreCase(rateBooking.getBaseCurrency())
-                || !record.getCounterCurrency().equalsIgnoreCase(rateBooking.getCounterCurrency())) {
+        if (!(record.getBaseCurrency().equalsIgnoreCase(rateBooking.getBaseCurrency())
+                && record.getCounterCurrency().equalsIgnoreCase(rateBooking.getCounterCurrency()))) {
             return false;
         }
 
@@ -206,6 +204,8 @@ public class ForexRateService {
     }
 
     private ForexRateBooking buildRateBookingRecord(ForexRateBookingReq request, ForexRate rate) {
+
+        log.info("build rate booking record for customer: {} with rate {}", request.getCustomerId(), rate);
 
         Instant timestamp = Instant.now();
         Instant expiryTime = timestamp.plusSeconds(bookingDuration);

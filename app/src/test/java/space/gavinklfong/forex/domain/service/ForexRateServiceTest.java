@@ -1,15 +1,13 @@
 package space.gavinklfong.forex.domain.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import space.gavinklfong.forex.apiclient.ForexRateApiClient;
 import space.gavinklfong.forex.apiclient.dto.ForexRateApiResponse;
 import space.gavinklfong.forex.domain.dto.ForexPricing;
@@ -29,77 +27,82 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-@SpringJUnitConfig
-@TestPropertySource(properties = {
-	    "app.rate-booking-duration=120",
-	    "app.default-additional-pip=1"
-})
-@ContextConfiguration(classes = {ForexRateService.class})
+@Slf4j
 @Tag("UnitTest")
+@ExtendWith(MockitoExtension.class)
 class ForexRateServiceTest {
 	
-	private static Logger logger = LoggerFactory.getLogger(ForexRateServiceTest.class);
-	
-	@MockBean
+	@Mock
 	private ForexRateApiClient forexRateApiClient;
-	
-	@MockBean
+	@Mock
 	private CustomerRepo customerRepo;
-	
-	@MockBean
+	@Mock
 	private ForexRateBookingRepo rateBookingRepo;
-	
-	@MockBean
+	@Mock
 	private ForexPricingService forexPriceService;
-
-	@Autowired
-	private ForexRateService rateService;
 	
 	private static final double ADDITIONAL_PIP = 0.0001;
-	
+	private static final long RATE_BOOKING_DURATION = 120L;
+	private static final String BOOKING_REF = "ABC";
+
+	private ForexRateService rateService;
+
+	@BeforeEach
+	void setup() {
+		rateService = new ForexRateService(RATE_BOOKING_DURATION, forexRateApiClient, rateBookingRepo,
+				customerRepo, forexPriceService);
+	}
+
 	@Test
 	void validateRateBookingTest_validBooking() {
 		
-		ForexRateBooking mockRecord = new ForexRateBooking("GBP", "USD", 0.25, BigDecimal.valueOf(1000), "ABC");
-		mockRecord.setExpiryTime(Instant.now().plus(Duration.ofMinutes(15)));
-		when(rateBookingRepo.findByBookingRef(anyString())).thenReturn(Arrays.asList(mockRecord));
-		
-		ForexRateBooking rateBooking = new ForexRateBooking("GBP", "USD", 0.25, BigDecimal.valueOf(1000), "ABC");
-		
-		Boolean result = rateService.validateRateBooking(rateBooking);
-		assertTrue(result);
+		ForexRateBooking rateBooking = buildForexRateBooking();
+		when(rateBookingRepo.findByBookingRef(BOOKING_REF)).thenReturn(List.of(rateBooking));
+
+		assertThat(rateService.validateRateBooking(rateBooking))
+				.isTrue();
 	}
 	
 	@Test
 	void validateRateBookingTest_invalidBooking_notFound() {
-		
-		when(rateBookingRepo.findByBookingRef(anyString())).thenReturn(null);
-		
-		ForexRateBooking rateBooking = new ForexRateBooking("GBP", "USD", 0.25, BigDecimal.valueOf(1000), "ABC");
-		
-		Boolean result = rateService.validateRateBooking(rateBooking);
-		assertFalse(result);
+
+		when(rateBookingRepo.findByBookingRef(BOOKING_REF)).thenReturn(null);
+
+		ForexRateBooking rateBooking = buildForexRateBooking();
+
+		assertThat(rateService.validateRateBooking(rateBooking))
+				.isFalse();
 	}
 	
 	@Test
 	void validateRateBookingTest_invalidBooking_expired() {
-		
-		ForexRateBooking mockRecord = new ForexRateBooking("GBP", "USD", 0.25, BigDecimal.valueOf(1000), "ABC");
-		mockRecord.setExpiryTime(Instant.now().minus(Duration.ofMinutes(15)));
-		when(rateBookingRepo.findByBookingRef(anyString())).thenReturn(Arrays.asList(mockRecord));
-		
-		ForexRateBooking rateBooking = new ForexRateBooking("GBP", "USD", 0.25, BigDecimal.valueOf(1000), "ABC");
-		
-		Boolean result = rateService.validateRateBooking(rateBooking);
-		assertFalse(result);
-		
+
+		ForexRateBooking rateBooking = buildForexRateBooking();
+		ForexRateBooking rateBookingInDB = rateBooking.toBuilder()
+												.expiryTime(Instant.now().minus(Duration.ofMinutes(15)))
+												.build();
+		when(rateBookingRepo.findByBookingRef(anyString())).thenReturn(List.of(rateBookingInDB));
+
+		assertThat(rateService.validateRateBooking(rateBooking))
+				.isFalse();
 	}
-	
-	
+
+	private ForexRateBooking buildForexRateBooking() {
+		return ForexRateBooking.builder()
+				.baseCurrency("GBP")
+				.counterCurrency("USD")
+				.rate(0.25)
+				.baseCurrencyAmount(new BigDecimal("1000"))
+				.bookingRef(BOOKING_REF)
+				.expiryTime(Instant.now().plus(Duration.ofMinutes(15)))
+				.build();
+	}
+
 	@Test
 	void fetchLatestRatesTest() {
 		
@@ -109,10 +112,9 @@ class ForexRateServiceTest {
 		final double USD_RATE_WITH_PRICE = 1.3868445262 + ADDITIONAL_PIP;
 		final double EUR_RATE_WITH_PRICE = 1.1499540018 + ADDITIONAL_PIP;
 
-		
 		Map<String, Double> rates = new HashMap<>();
-		rates.put("USD", Double.valueOf(USD_RATE));
-		rates.put("EUR", Double.valueOf(EUR_RATE));
+		rates.put("USD", USD_RATE);
+		rates.put("EUR", EUR_RATE);
 		ForexRateApiResponse forexRateApiResponse = new ForexRateApiResponse("GBP", LocalDate.now(), rates);
 		
 		when(forexRateApiClient.fetchLatestRates("GBP"))
@@ -120,9 +122,9 @@ class ForexRateServiceTest {
 
 		when(forexPriceService.obtainForexPrice(anyString(), anyString(), anyDouble()))
 				.thenAnswer(invocation -> {
-					String base = (String)invocation.getArgument(0);
-					String counter = (String)invocation.getArgument(1);
-					Double rate = (Double)invocation.getArgument(2);
+					String base = invocation.getArgument(0);
+					String counter = invocation.getArgument(1);
+					Double rate = invocation.getArgument(2);
 					return ForexRate.builder().
 							baseCurrency(base).counterCurrency(counter)
 							.buyRate(rate + 2).sellRate(rate + 4).build();
@@ -248,7 +250,7 @@ class ForexRateServiceTest {
 		ForexRateBookingReq request = ForexRateBookingReq.builder()
 				.baseCurrency("GBP").counterCurrency("USD")
 				.baseCurrencyAmount(BigDecimal.valueOf(1000))
-				.customerId(1l).tradeAction(TradeAction.BUY)
+				.customerId(1L).tradeAction(TradeAction.BUY)
 				.build();
 
 		return rateService.obtainBooking(request);

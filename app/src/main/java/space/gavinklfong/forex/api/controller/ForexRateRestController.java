@@ -1,7 +1,6 @@
 package space.gavinklfong.forex.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,16 +21,19 @@ import java.util.List;
 @RestController
 public class ForexRateRestController implements RateApi {
 
-	@Value("${app.default-base-currency}")
-	private String defaultBaseCurrency;
-
-	@Autowired
-	private ForexRateService rateService;
-
-	@Autowired
-	private ForexPricingService pricingService;
+	private final String defaultBaseCurrency;
+	private final ForexRateService rateService;
+	private final ForexPricingService pricingService;
 
 	private static final ApiModelAdapter mapper = ApiModelAdapter.INSTANCE;
+
+	public ForexRateRestController(@Value("${app.default-base-currency}") String defaultBaseCurrency,
+								   ForexRateService forexRateService,
+								   ForexPricingService forexPricingService) {
+		this.defaultBaseCurrency = defaultBaseCurrency;
+		this.rateService = forexRateService;
+		this.pricingService = forexPricingService;
+	}
 
 	@Override
 	public ResponseEntity<List<String>> getBaseCurrencies() {

@@ -1,5 +1,6 @@
 
 INSERT INTO customer (name, tier) VALUES ('tester 1', 1);
+INSERT INTO customer (name, tier) VALUES ('tester 1001', 1001);
 INSERT INTO customer (name, tier) VALUES ('tester 2', 1);
 INSERT INTO customer (name, tier) VALUES ('tester 3', 1);
 

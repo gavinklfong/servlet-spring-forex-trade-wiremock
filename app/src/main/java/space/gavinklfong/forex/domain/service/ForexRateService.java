@@ -127,7 +127,7 @@ public class ForexRateService {
      */
     public ForexRateBooking obtainBooking(ForexRateBookingReq request) {
 
-        log.info("handle booking for customer: {}", request.getCustomerId());
+        log.info("handle booking for customer: {}, request: {}", request.getCustomerId(), request);
 
         List<ForexPricing> forexPricingList = forexPriceService.findCounterCurrencies(request.getBaseCurrency());
         if (forexPricingList.stream().noneMatch(p -> p.getCounterCurrency().equalsIgnoreCase(request.getCounterCurrency()))) {

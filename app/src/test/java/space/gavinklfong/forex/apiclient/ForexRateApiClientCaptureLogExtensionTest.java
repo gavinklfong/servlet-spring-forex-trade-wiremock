@@ -16,6 +16,7 @@ import space.gavinklfong.forex.apiclient.dto.ForexRateApiResponse;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit test of forex rate API client.
@@ -30,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WireMockTest
 @ExtendWith(OutputCaptureExtension.class)
 @Tag("UnitTest")
-class ForexRateApiClientTest {
+class ForexRateApiClientCaptureLogExtensionTest {
 
     private ForexRateApiClient forexRateApiClient;
 
@@ -57,14 +58,15 @@ class ForexRateApiClientTest {
 	}
 
     @Test
-    void getUSDRate(CapturedOutput output) {
+    void givenGBPUSD_whenGetRateByCurrencyPair_thenReturnRate(CapturedOutput output, WireMockRuntimeInfo wireMockRuntimeInfo) {
 
+        // Setup stub using wiremock
         stubFor(get("/rates/GBP-USD").willReturn(
                 aResponse().withStatus(HttpStatus.OK.value())
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withBodyFile("getLatestUSDRateMockResponse.json")));
 
-        // Initialize API client and trigger request
+        // Trigger request
         ForexRateApiResponse response = forexRateApiClient.fetchLatestRate("GBP", "USD");
 
         // Assert response
@@ -72,8 +74,30 @@ class ForexRateApiClientTest {
         assertThat(response.getRates()).hasSize(1)
                 .containsEntry("USD", 1.3923701653);
 
-        System.out.println(output.getOut());
+        assertThat(output.getOut())
+                .contains("INFO")
+                .contains(String.format("Fetch the latest rate from %s with uri /rates/GBP-USD",
+                        wireMockRuntimeInfo.getHttpBaseUrl()));
 	}
+
+    @Test
+    void givenEmptyBaseCurrency_whenGetRateByCurrencyPair_thenThrowException(CapturedOutput output, WireMockRuntimeInfo wireMockRuntimeInfo) {
+
+        stubFor(get("/rates/GBP-USD").willReturn(
+                aResponse().withStatus(HttpStatus.OK.value())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withBodyFile("getLatestUSDRateMockResponse.json")));
+
+        // Initialize API client and trigger request
+        assertThatThrownBy(() -> forexRateApiClient.fetchLatestRate("", "USD"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        // Assert response
+        assertThat(output.getOut())
+                .contains("ERROR")
+                .contains("Failed to fetch the latest rate. Either base currency or counter currency is empty");
+    }
+
 
     @Test
     void givenRateApiReturn500_whenGetUSDRate_thenThrowException(CapturedOutput output) {

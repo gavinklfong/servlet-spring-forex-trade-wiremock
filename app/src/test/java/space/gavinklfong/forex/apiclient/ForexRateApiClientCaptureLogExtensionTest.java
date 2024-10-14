@@ -12,6 +12,7 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import space.gavinklfong.forex.apiclient.dto.ForexRateApiResponse;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -106,13 +107,7 @@ class ForexRateApiClientCaptureLogExtensionTest {
                 aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
         // Initialize API client and trigger request
-        ForexRateApiResponse response = forexRateApiClient.fetchLatestRate("GBP", "USD");
-
-        // Assert response
-        assertThat(response).returns("GBP", ForexRateApiResponse::getBase);
-        assertThat(response.getRates()).hasSize(1)
-                .containsEntry("USD", 1.3923701653);
-
-        System.out.println(output.getOut());
+        assertThatThrownBy(() ->forexRateApiClient.fetchLatestRate("GBP", "USD"))
+                .isInstanceOf(WebClientResponseException.class);
     }
 }

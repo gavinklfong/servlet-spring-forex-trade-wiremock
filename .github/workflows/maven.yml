@@ -75,7 +75,7 @@ jobs:
         with:
           name: my-artifact
       - name: output variable
-        run: echo ${{ env.IMAGE_TAG }}
+        run: echo ${{ vars.GITHUB_REPOSITORY }}:${{ needs.build.version.outputs.new_tag }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub

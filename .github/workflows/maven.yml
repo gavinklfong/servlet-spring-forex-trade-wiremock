@@ -30,13 +30,13 @@ jobs:
       - name: output
         run: echo ${{ steps.version.outputs.new_tag }}
       - name: Bump version again
-        id: version
+        id: version_2
         uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
         env:
           WITH_V: true
           DRY_RUN: true
       - name: output again
-        run: echo ${{ steps.version.outputs.new_tag }}
+        run: echo ${{ steps.version_2.outputs.new_tag }}
 
 #      - name: Set up JDK 17
 #        uses: actions/setup-java@v3

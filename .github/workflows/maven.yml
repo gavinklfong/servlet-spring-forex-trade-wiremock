@@ -77,18 +77,18 @@ jobs:
         run: ls -R
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Get latest version
-        id: latest_version
-        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
-        env:
-          WITH_V: true
-          GIT_API_TAGGING: false
-          DRY_RUN: true
-          DEFAULT_BRANCH: github-action-demo
+#      - name: Get latest version
+#        id: latest_version
+#        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+#        env:
+#          WITH_V: true
+#          GIT_API_TAGGING: false
+#          DRY_RUN: true
+#          DEFAULT_BRANCH: github-action-demo
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ github.workspace }}/docker/Dockerfile
           push: false
-          tags: ${{ steps.latest_version.outputs.tag }}
+          tags: ${{ needs.build.version.outputs.new_tag }}

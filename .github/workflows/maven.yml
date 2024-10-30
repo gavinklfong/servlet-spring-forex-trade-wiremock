@@ -63,7 +63,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-artifact
+          name: my-workspace
           path: ${{ github.workspace }}/**/*
 
   build-image:
@@ -75,9 +75,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: my-artifact
-      - name: output variable
-        run: echo ${{ github.repository }}:${{ needs.build.outputs.tag-version }}
+          name: my-workspace
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
@@ -85,16 +83,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v6
-        with:
-          load: true
-          context: .
-          file: ${{ github.workspace }}/docker/Dockerfile
-          tags: ${{ env.IMAGE_TAG }}
-      - name: Test docker image
-        run: |
-          docker run --rm ${{ env.IMAGE_TAG }}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -102,3 +90,10 @@ jobs:
           context: .
           file: ${{ github.workspace }}/docker/Dockerfile
           tags: ${{ env.IMAGE_TAG }}
+
+  deploy:
+    needs: build-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Demo
+        run: echo run deployment command

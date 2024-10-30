@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Java Application Pipeline
 
 on:
   push:
@@ -17,11 +17,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -37,3 +36,20 @@ jobs:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
         include_passed: true
         detailed_summary: true
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: ${{ github.workspace }}/**/*
+
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
+      - name: Show artifact files
+        run: ls -R
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3

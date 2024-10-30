@@ -26,7 +26,7 @@ jobs:
         uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
         env:
           WITH_V: true
-          DRY_RUN: true
+          DRY_RUN: false
       - name: output
         run: echo ${{ steps.version.outputs.new_tag }}
       - name: Bump version again

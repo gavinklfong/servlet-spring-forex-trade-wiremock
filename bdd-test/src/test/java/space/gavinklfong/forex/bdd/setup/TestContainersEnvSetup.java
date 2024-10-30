@@ -32,7 +32,7 @@ public class TestContainersEnvSetup implements EnvSetup {
     private static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(
             DockerImageName.parse("mysql").withTag("5.7"));
     private static final GenericContainer<?> APP_CONTAINER = new GenericContainer<>(
-            DockerImageName.parse(APP_IMAGE_NAME).withTag("spring-3"));
+            DockerImageName.parse(APP_IMAGE_NAME).withTag("0-SNAPSHOT"));
     private static final Network NETWORK = Network.newNetwork();
 
     public void initialize() {

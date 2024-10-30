@@ -27,37 +27,37 @@ jobs:
         env:
           WITH_V: true
           GIT_API_TAGGING: false
-          DRY_RUN: false
+          DRY_RUN: true
           DEFAULT_BRANCH: github-action-demo
       - name: output
         run: echo ${{ steps.version.outputs.new_tag }}
-      - name: Bump version again
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Update version
+        run: mvn versions:set -DnewVersion=${{ steps.version.outputs.new_tag }}
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
+          include_passed: true
+          detailed_summary: true
+
+      - name: Push version
         id: version_2
         uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
         env:
           WITH_V: true
-          DRY_RUN: true
+          GIT_API_TAGGING: false
+          DRY_RUN: false
           DEFAULT_BRANCH: github-action-demo
-      - name: output again
-        run: echo ${{ steps.version_2.outputs.new_tag }}
-
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '17'
-#          distribution: 'temurin'
-#          cache: maven
-#      - name: Update version
-#        run: mvn versions:set -DnewVersion=${{ steps.version.outputs.new_tag }}
-#      - name: Build with Maven
-#        run: mvn -B package --file pom.xml
-#      - name: Publish Test Report
-#        uses: mikepenz/action-junit-report@v4
-#        if: success() || failure() # always run even if the previous step fails
-#        with:
-#          report_paths: '**/target/surefire-reports/TEST-*.xml'
-#          include_passed: true
-#          detailed_summary: true
 
 #jobs:
 #  build:

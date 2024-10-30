@@ -43,6 +43,7 @@ jobs:
         path: ${{ github.workspace }}/**/*
 
   build-image:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact

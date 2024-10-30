@@ -70,7 +70,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      IMAGE_TAG: ${{ github.event.repository.name }}:${{ needs.build.outputs.tag-version }}
+      IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.build.outputs.tag-version }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4

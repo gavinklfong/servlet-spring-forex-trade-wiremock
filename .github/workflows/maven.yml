@@ -67,6 +67,8 @@ jobs:
   build-image:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ GITHUB_REPOSITORY }}:${{ needs.build.version.outputs.new_tag }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -85,14 +87,14 @@ jobs:
           load: true
           context: .
           file: ${{ github.workspace }}/docker/Dockerfile
-          tags: ${{ needs.build.version.outputs.new_tag }}
+          tags: ${{ IMAGE_TAG }}
       - name: Test docker image
         run: |
-          docker run --rm ${{ needs.build.version.outputs.new_tag }}
+          docker run --rm ${{ IMAGE_TAG }}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: true
           context: .
           file: ${{ github.workspace }}/docker/Dockerfile
-          tags: ${{ needs.build.version.outputs.new_tag }}
+          tags: ${{ IMAGE_TAG }}

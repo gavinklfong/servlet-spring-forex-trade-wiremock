@@ -19,45 +19,66 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-    - name: Publish Test Report
-      uses: mikepenz/action-junit-report@v4
-      if: success() || failure() # always run even if the previous step fails
-      with:
-        report_paths: '**/target/surefire-reports/TEST-*.xml'
-        include_passed: true
-        detailed_summary: true
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: my-artifact
-        path: ${{ github.workspace }}/**/*
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          WITH_V: true
+          GIT_API_TAGGING: false
+      - name: output
+        run: echo "$tag"
 
-  build-image:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: my-artifact
-      - name: Show artifact files
-        run: ls -R
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ github.workspace }}/docker/Dockerfile
-          push: false
-          tags: user/app:latest
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#    - name: Bump version and push tag
+#      uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+#        WITH_V: true
+#        PRERELEASE: true
+#
+#    - name: Set up JDK 17
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '17'
+#        distribution: 'temurin'
+#        cache: maven
+#    - name: Build with Maven
+#      run: mvn -B package --file pom.xml
+#    - name: Publish Test Report
+#      uses: mikepenz/action-junit-report@v4
+#      if: success() || failure() # always run even if the previous step fails
+#      with:
+#        report_paths: '**/target/surefire-reports/TEST-*.xml'
+#        include_passed: true
+#        detailed_summary: true
+#    - name: Upload artifact
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: my-artifact
+#        path: ${{ github.workspace }}/**/*
+#
+#  build-image:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Download artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: my-artifact
+#      - name: Show artifact files
+#        run: ls -R
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#      - name: Build and push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: ${{ github.workspace }}/docker/Dockerfile
+#          push: false
+#          tags: user/app:latest

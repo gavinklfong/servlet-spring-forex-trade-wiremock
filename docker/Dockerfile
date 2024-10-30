@@ -17,5 +17,11 @@ WORKDIR /app
 
 COPY docker/entrypoint.sh /app/entrypoint.sh
 
+RUN useradd appuser
+RUN chown appuser /app/entrypoint.sh
+
+USER appuser
+RUN chmod u+x /app/entrypoint.sh
+
 CMD ["/app/entrypoint.sh"]
 

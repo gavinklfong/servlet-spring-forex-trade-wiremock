@@ -22,12 +22,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Bump version and push tag
+        id: version
         uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
         env:
           WITH_V: true
-          GIT_API_TAGGING: false
+          DRY_RUN: true
       - name: output
-        run: echo "$tag"
+        run: echo ${{ steps.version.outputs.new_tag }}
 
 #jobs:
 #  build:

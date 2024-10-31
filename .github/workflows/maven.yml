@@ -30,7 +30,7 @@ jobs:
           WITH_V: true
           GIT_API_TAGGING: false
           DRY_RUN: true
-          DEFAULT_BRANCH: github-action-demo
+          DEFAULT_BRANCH: master
 
       - name: output new version
         run: echo ${{ steps.set-version.outputs.new_tag }}
@@ -60,7 +60,7 @@ jobs:
           WITH_V: true
           GIT_API_TAGGING: false
           DRY_RUN: false
-          DEFAULT_BRANCH: github-action-demo
+          DEFAULT_BRANCH: master
 
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'

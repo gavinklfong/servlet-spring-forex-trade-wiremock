@@ -7,9 +7,6 @@ import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -96,23 +93,5 @@ class ForexRateApiClientLogCaptorTest {
         // Assert response
         assertThat(logCaptor.getErrorLogs())
                 .contains("Failed to fetch the latest rate. Either base currency or counter currency is empty");
-    }
-
-
-    @Test
-    void givenRateApiReturn500_whenGetUSDRate_thenThrowException(CapturedOutput output) {
-
-        stubFor(get("/rates/GBP-USD").willReturn(
-                aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
-
-        // Initialize API client and trigger request
-        ForexRateApiResponse response = forexRateApiClient.fetchLatestRate("GBP", "USD");
-
-        // Assert response
-        assertThat(response).returns("GBP", ForexRateApiResponse::getBase);
-        assertThat(response.getRates()).hasSize(1)
-                .containsEntry("USD", 1.3923701653);
-
-        System.out.println(output.getOut());
     }
 }

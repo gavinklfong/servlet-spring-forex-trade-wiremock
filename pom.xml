@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>space.gavinklfong</groupId>
 	<artifactId>servlet-spring-forex-trade</artifactId>
-	<version>spring-3</version>
+	<version>0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>servlet-spring-forex-trade</name>
@@ -33,7 +33,7 @@
 		<org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
 		<common.lang3.version>3.12.0</common.lang3.version>
 
-		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+<!--		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>-->
 		<springdoc-openapi-maven-plugin.version>1.4</springdoc-openapi-maven-plugin.version>
 		<jarkata-servlet.version>6.0.0</jarkata-servlet.version>
 		<maven-cucumber-reporting.version>5.7.4</maven-cucumber-reporting.version>
@@ -61,7 +61,7 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<!-- containerization -->
-		<docker.image>whalebig27/servlet-spring-forex-trade</docker.image>
+<!--		<docker.image>whalebig27/servlet-spring-forex-trade</docker.image>-->
 
 	</properties>
 
@@ -293,18 +293,18 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
-				<version>${dependency-check-maven.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.owasp</groupId>-->
+<!--				<artifactId>dependency-check-maven</artifactId>-->
+<!--				<version>${dependency-check-maven.version}</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>check</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 </project>

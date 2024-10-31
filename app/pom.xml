@@ -6,7 +6,7 @@
     <parent>
         <groupId>space.gavinklfong</groupId>
         <artifactId>servlet-spring-forex-trade</artifactId>
-        <version>spring-3</version>
+        <version>0-SNAPSHOT</version>
     </parent>
 
     <artifactId>app</artifactId>
@@ -381,28 +381,28 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>${dockerfile-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>package</id>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <repository>${docker.image}</repository>
-                    <tag>${project.version}</tag>
-                    <contextDirectory>${project.parent.basedir}</contextDirectory>
-                    <dockerfile>${project.parent.basedir}/docker/Dockerfile</dockerfile>
-                    <buildArgs>
-                        <JAR_FILE>app/target/${project.build.finalName}.jar</JAR_FILE>
-                    </buildArgs>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>com.spotify</groupId>-->
+<!--                <artifactId>dockerfile-maven-plugin</artifactId>-->
+<!--                <version>${dockerfile-maven-plugin.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>package</id>-->
+<!--                        <goals>-->
+<!--                            <goal>build</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <repository>${docker.image}</repository>-->
+<!--                    <tag>${project.version}</tag>-->
+<!--                    <contextDirectory>${project.parent.basedir}</contextDirectory>-->
+<!--                    <dockerfile>${project.parent.basedir}/docker/Dockerfile</dockerfile>-->
+<!--                    <buildArgs>-->
+<!--                        <JAR_FILE>app/target/${project.build.finalName}.jar</JAR_FILE>-->
+<!--                    </buildArgs>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 

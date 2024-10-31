@@ -25,13 +25,14 @@ jobs:
         uses: actions/checkout@v3
       - name: Bump version
         id: set-version
-        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        uses: anothrNick/github-tag-action@1.71.0
         env:
           WITH_V: true
           GIT_API_TAGGING: false
           DRY_RUN: true
           DEFAULT_BRANCH: github-action-demo
-      - name: output
+
+      - name: output new version
         run: echo ${{ steps.set-version.outputs.new_tag }}
 
       - name: Set up JDK 17
@@ -40,11 +41,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Update version
+      - name: Apply new version
         run: mvn versions:set -DnewVersion=${{ steps.set-version.outputs.new_tag }}
-      - name: Build with Maven
+      - name: Build
         run: mvn -B package --file pom.xml
-      - name: Publish Test Report
+      - name: Publish test report
         uses: mikepenz/action-junit-report@v4
         if: success() || failure() # always run even if the previous step fails
         with:
@@ -53,7 +54,8 @@ jobs:
           detailed_summary: true
 
       - name: Tag version
-        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        if: github.ref == 'refs/heads/master'
+        uses: anothrNick/github-tag-action@1.71.0
         env:
           WITH_V: true
           GIT_API_TAGGING: false
@@ -61,12 +63,14 @@ jobs:
           DEFAULT_BRANCH: github-action-demo
 
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
           name: my-workspace
           path: ${{ github.workspace }}/**/*
 
   build-image:
+    if: github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -92,6 +96,7 @@ jobs:
           tags: ${{ env.IMAGE_TAG }}
 
   deploy:
+    if: github.ref == 'refs/heads/master'
     needs: build-image
     runs-on: ubuntu-latest
     steps:

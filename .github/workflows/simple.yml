@@ -4,26 +4,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  job_1:
+  job_A:
     runs-on: ubuntu-latest
     steps:
-      - name: step 1
+      - name: step A1
         run: |
-          echo "execute job 1 - step 1"
-      - name: step 2
+          echo "execute job A - step 1"
+      - name: step A2
         run: |
-          echo "execute job 1 - step 2"
-  job_2:
-    needs: [ job_1 ]
+          echo "execute job A - step 2"
+  job_B:
+    needs: [ job_A ]
     runs-on: ubuntu-latest
     steps:
-      - name: step 1
+      - name: step B1
         run: |
-          echo "execute job 2"
-  job_3:
-    needs: [ job_1 ]
+          echo "execute job B"
+  job_C:
+    needs: [ job_A ]
     runs-on: ubuntu-latest
     steps:
-      - name: step 1
+      - name: step C1
         run: |
-          echo "execute job 3"          
+          echo "execute job C"          

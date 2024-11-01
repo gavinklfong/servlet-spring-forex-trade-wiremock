@@ -1,4 +1,4 @@
-name: Greetings
+name: Simple Workflow
 
 on: 
   workflow_dispatch:

@@ -1,16 +1,29 @@
 name: Greetings
 
-on: [pull_request_target, issues]
+on: 
+  workflow_dispatch:
 
 jobs:
-  greeting:
+  job_1:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
     steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: "Message that will be displayed on users' first issue"
-        pr-message: "Message that will be displayed on users' first pull request"
+      - name: step 1
+        run: |
+          echo "execute job 1 - step 1"
+      - name: step 2
+        run: |
+          echo "execute job 1 - step 2"
+  job_2:
+    needs: [ job_1 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        run: |
+          echo "execute job 2"
+  job_3:
+    needs: [ job_1 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        run: |
+          echo "execute job 3"          
